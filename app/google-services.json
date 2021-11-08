@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "261208321254",
+    "project_id": "app-chats-12bb9",
+    "storage_bucket": "app-chats-12bb9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261208321254:android:c423b4375ed183e8459f27",
+        "android_client_info": {
+          "package_name": "vn.itplus.vinhpv.appchats"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "261208321254-sttinmia3ktgnuq139kbfolpvuc34h3q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxDQ2y61gveTPxPk5KkGA7wSrAE1Bxi6E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "261208321254-sttinmia3ktgnuq139kbfolpvuc34h3q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
