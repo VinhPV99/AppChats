@@ -57,7 +57,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="60dp"
         android:layout_marginRight="20dp"
-        android:backgroundTint="#0384DA"
+        android:backgroundTint="@color/colorPrimary"
         android:text="Tạo tài khoản"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

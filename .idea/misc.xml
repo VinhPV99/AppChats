@@ -13,7 +13,9 @@
         <entry key="..\:/AppChats/app/src/main/res/drawable/background_left.xml" value="0.2405" />
         <entry key="..\:/AppChats/app/src/main/res/drawable/bg_receiver.xml" value="0.11" />
         <entry key="..\:/AppChats/app/src/main/res/drawable/bg_sender.xml" value="0.11" />
+        <entry key="..\:/AppChats/app/src/main/res/drawable/editextstyle.xml" value="0.11" />
         <entry key="..\:/AppChats/app/src/main/res/drawable/ic_baseline_send_24.xml" value="0.2405" />
+        <entry key="..\:/AppChats/app/src/main/res/layout/activity_add_post.xml" value="0.1" />
         <entry key="..\:/AppChats/app/src/main/res/layout/activity_dashboard.xml" value="0.23802083333333332" />
         <entry key="..\:/AppChats/app/src/main/res/layout/activity_login.xml" value="0.23802083333333332" />
         <entry key="..\:/AppChats/app/src/main/res/layout/activity_main.xml" value="0.23802083333333332" />
@@ -25,6 +27,7 @@
         <entry key="..\:/AppChats/app/src/main/res/layout/fragment_home_.xml" value="0.23802083333333332" />
         <entry key="..\:/AppChats/app/src/main/res/layout/fragment_profile_.xml" value="0.23802083333333332" />
         <entry key="..\:/AppChats/app/src/main/res/layout/fragment_users_.xml" value="0.23802083333333332" />
+        <entry key="..\:/AppChats/app/src/main/res/layout/row_posts.xml" value="0.2" />
         <entry key="..\:/AppChats/app/src/main/res/layout/row_user.xml" value="0.23802083333333332" />
         <entry key="..\:/AppChats/app/src/main/res/menu/menu_main.xml" value="0.23802083333333332" />
         <entry key="..\:/AppChats/app/src/main/res/menu/menu_nav.xml" value="0.23802083333333332" />

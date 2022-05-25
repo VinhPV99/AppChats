@@ -14,10 +14,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppChats">
-        <activity android:name=".activity.MessageActivity"
-            android:theme="@style/Theme.MessageBeta" >
-
-        </activity>
+        <activity
+            android:name=".activity.AddPostActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.MessageActivity"
+            android:theme="@style/Theme.MessageBeta"></activity>
         <activity android:name=".activity.LoginActivity" />
         <activity android:name=".activity.DashboardActivity">
             <intent-filter>
@@ -28,8 +30,7 @@
         <activity android:name=".activity.RegisterActivity" />
         <activity
             android:name=".activity.MainActivity"
-            android:theme="@style/Theme.MessageBeta">
-        </activity>
+            android:theme="@style/Theme.MessageBeta"></activity>
     </application>
 
 </manifest>

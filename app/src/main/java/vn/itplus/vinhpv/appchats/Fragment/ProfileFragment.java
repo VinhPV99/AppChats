@@ -50,9 +50,10 @@ import com.squareup.picasso.Picasso;
 import java.util.HashMap;
 
 import vn.itplus.vinhpv.appchats.R;
+import vn.itplus.vinhpv.appchats.activity.AddPostActivity;
 import vn.itplus.vinhpv.appchats.activity.MainActivity;
 
-public class Profile_Fragment extends Fragment {
+public class ProfileFragment extends Fragment {
 
     // permissions constants
     private static final int CAMERA_REQUEST_CODE = 100;
@@ -82,7 +83,7 @@ public class Profile_Fragment extends Fragment {
     Uri imageUri;
 
 
-    public Profile_Fragment() {
+    public ProfileFragment() {
     }
 
     @Override
@@ -209,7 +210,7 @@ public class Profile_Fragment extends Fragment {
             case STORAGE_REQUEST_CODE: {
                 // picking from gallery,first check if  storage permissions allowed or not
                 if (grantResults.length > 0) {
-                    boolean writeStorageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    boolean writeStorageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                     if (writeStorageAccepted) {
                         // permissions enabled
                         pickFromGallery();
@@ -456,9 +457,12 @@ public class Profile_Fragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_menu) {
+        if (id == R.id.action_log_out) {
             firebaseAuth.signOut();
             checkUserStatus();
+        }
+        if (id == R.id.action_post) {
+            startActivity(new Intent(getActivity(), AddPostActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

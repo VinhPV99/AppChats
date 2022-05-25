@@ -19,12 +19,12 @@ import vn.itplus.vinhpv.appchats.activity.MessageActivity;
 import vn.itplus.vinhpv.appchats.Model.User;
 import vn.itplus.vinhpv.appchats.R;
 
-public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder> {
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyHolder> {
     Context context;
     List<User> userList;
     private boolean isChat;
 
-    public AdapterUser(Context context, List<User> userList, boolean isChat) {
+    public UserAdapter(Context context, List<User> userList, boolean isChat) {
         this.context = context;
         this.userList = userList;
         this.isChat = isChat;
@@ -36,7 +36,7 @@ public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder> {
         View view = LayoutInflater.from(context).inflate(R.layout.row_user, viewGroup, false);
 
 
-        return new AdapterUser.MyHolder(view);
+        return new UserAdapter.MyHolder(view);
     }
 
     @Override

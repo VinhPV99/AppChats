@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragment.Profile_Fragment">
+    tools:context=".Fragment.ProfileFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
                 android:id="@+id/coverTV"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
-                android:background="#387EF8"
+                android:background="@color/colorPrimary"
                 android:scaleType="fitXY"></ImageView>
 
             <LinearLayout

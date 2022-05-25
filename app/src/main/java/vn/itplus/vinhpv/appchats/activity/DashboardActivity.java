@@ -17,10 +17,10 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 
-import vn.itplus.vinhpv.appchats.Fragment.ChatList_Fragment;
-import vn.itplus.vinhpv.appchats.Fragment.Home_Fragment;
-import vn.itplus.vinhpv.appchats.Fragment.Profile_Fragment;
-import vn.itplus.vinhpv.appchats.Fragment.Users_Fragment;
+import vn.itplus.vinhpv.appchats.Fragment.ChatListFragment;
+import vn.itplus.vinhpv.appchats.Fragment.HomeFragment;
+import vn.itplus.vinhpv.appchats.Fragment.ProfileFragment;
+import vn.itplus.vinhpv.appchats.Fragment.UsersFragment;
 import vn.itplus.vinhpv.appchats.R;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -45,11 +45,11 @@ public class DashboardActivity extends AppCompatActivity {
         BottomNavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(selectedListener);
 
-        actionBar.setTitle("Cuộc Trò Chuyện");
-        ChatList_Fragment fragment1 = new ChatList_Fragment();
-        FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
-        ft1.replace(R.id.content, fragment1, "");
-        ft1.commit();
+        actionBar.setTitle("Trang chủ");
+        HomeFragment fragment = new HomeFragment();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.content, fragment, "");
+        ft.commit();
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener selectedListener
@@ -59,8 +59,8 @@ public class DashboardActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.nav_home:
 
-                    actionBar.setTitle("Trang chủ ");
-                    Home_Fragment fragment = new Home_Fragment();
+                    actionBar.setTitle("Trang chủ");
+                    HomeFragment fragment = new HomeFragment();
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     ft.replace(R.id.content, fragment, "");
                     ft.commit();
@@ -69,7 +69,7 @@ public class DashboardActivity extends AppCompatActivity {
                 case R.id.nav_chats:
 
                     actionBar.setTitle("Cuộc Trò Chuyện");
-                    ChatList_Fragment fragment1 = new ChatList_Fragment();
+                    ChatListFragment fragment1 = new ChatListFragment();
                     FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
                     ft1.replace(R.id.content, fragment1, "");
                     ft1.commit();
@@ -77,7 +77,7 @@ public class DashboardActivity extends AppCompatActivity {
                 case R.id.nav_users:
 
                     actionBar.setTitle("Người Dùng");
-                    Users_Fragment fragment2 = new Users_Fragment();
+                    UsersFragment fragment2 = new UsersFragment();
                     FragmentTransaction ft2 = getSupportFragmentManager().beginTransaction();
                     ft2.replace(R.id.content, fragment2, "");
                     ft2.commit();
@@ -85,7 +85,7 @@ public class DashboardActivity extends AppCompatActivity {
                 case R.id.nav_profile:
 
                     actionBar.setTitle("Trang Cá Nhân");
-                    Profile_Fragment fragment3 = new Profile_Fragment();
+                    ProfileFragment fragment3 = new ProfileFragment();
                     FragmentTransaction ft3 = getSupportFragmentManager().beginTransaction();
                     ft3.replace(R.id.content, fragment3, "");
                     ft3.commit();

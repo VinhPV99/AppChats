@@ -21,7 +21,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="7dp"
-        android:backgroundTint="#107ACA"
+        android:backgroundTint="@color/colorPrimary"
         android:text="Đăng Nhập" />
 
     <Button
@@ -34,7 +34,7 @@
         android:layout_marginBottom="150dp"
         android:backgroundTint="#CCF1EDED"
         android:text="Tạo tài khoản"
-        android:textColor="#0D84DF"
+        android:textColor="@color/colorPrimary"
         android:textStyle="bold" />
 
 
