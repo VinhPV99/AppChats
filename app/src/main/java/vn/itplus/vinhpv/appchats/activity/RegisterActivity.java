@@ -30,8 +30,8 @@ import vn.itplus.vinhpv.appchats.R;
 /**
  * VinhPV Lớp đăng ký tài khoản
  */
-public class Register extends AppCompatActivity {
-    EditText txtEmail,txtPass;
+public class RegisterActivity extends AppCompatActivity {
+    EditText txtEmail, txtPass;
     Button btnRegister;
     TextView Tvlogin;
 
@@ -53,7 +53,7 @@ public class Register extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        progressDialog =new ProgressDialog(this);
+        progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(" Đang Đăng Ký...");
 
         mAuth = FirebaseAuth.getInstance();
@@ -65,17 +65,16 @@ public class Register extends AppCompatActivity {
                 String email = txtEmail.getText().toString().trim();
                 String password = txtPass.getText().toString().trim();
                 //set Email hợp lệ
-                if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     txtEmail.setError("Email bạn nhập không hợp lệ !!!");
                     txtEmail.setFocusable(true);
                 }
                 //set Pass hợp lệ
-                else if(password.length()<6){
+                else if (password.length() < 6) {
                     txtPass.setError("Mật khẩu ít nhất phải 6 kí tự !!!");
                     txtPass.setFocusable(true);
-                }
-                else {
-                    registerUser(email,password);
+                } else {
+                    registerUser(email, password);
                 }
             }
         });
@@ -83,7 +82,7 @@ public class Register extends AppCompatActivity {
         Tvlogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(Register.this,Login.class));
+                startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                 finish();
             }
         });
@@ -91,40 +90,40 @@ public class Register extends AppCompatActivity {
 
     private void registerUser(String email, String password) {
         progressDialog.show();
-        mAuth.createUserWithEmailAndPassword(email,password)
+        mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             progressDialog.dismiss();
                             FirebaseUser user = mAuth.getCurrentUser();
 
                             String email = user.getEmail();
                             String uid = user.getUid();
 
-                            HashMap<Object,String>hashMap = new HashMap<>();
+                            HashMap<Object, String> hashMap = new HashMap<>();
 
-                            hashMap.put("email",email);
-                            hashMap.put("uid",uid);
-                            hashMap.put("name","");
-                            hashMap.put("onlineStatus","online");
-                            hashMap.put("status","online");
-                            hashMap.put("phone","");
-                            hashMap.put("image","");
-                            hashMap.put("cover","");
+                            hashMap.put("email", email);
+                            hashMap.put("uid", uid);
+                            hashMap.put("name", "");
+                            hashMap.put("onlineStatus", "online");
+                            hashMap.put("status", "online");
+                            hashMap.put("phone", "");
+                            hashMap.put("image", "");
+                            hashMap.put("cover", "");
 
                             FirebaseDatabase database = FirebaseDatabase.getInstance();
                             DatabaseReference reference = database.getReference("Users");
                             reference.child(uid).setValue(hashMap);
 
 
-                            Toast.makeText(Register.this,"Đăng kí thành công"+user
-                                    .getEmail(),Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(Register.this, Dashboard.class));
+                            Toast.makeText(RegisterActivity.this, "Đăng kí thành công" + user
+                                    .getEmail(), Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(RegisterActivity.this, DashboardActivity.class));
                             finish();
-                        }else {
+                        } else {
                             progressDialog.dismiss();
-                            Toast.makeText(Register.this,"Tài khoản đã tồn tại !!",Toast.LENGTH_LONG).show();
+                            Toast.makeText(RegisterActivity.this, "Tài khoản đã tồn tại !!", Toast.LENGTH_LONG).show();
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {

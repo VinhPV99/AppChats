@@ -33,18 +33,19 @@ import vn.itplus.vinhpv.appchats.Model.Chatlist;
 import vn.itplus.vinhpv.appchats.Model.User;
 import vn.itplus.vinhpv.appchats.R;
 
-public class ChatList_Fragment extends Fragment {private AdapterUser userAdapter;
+public class ChatList_Fragment extends Fragment {
+    private AdapterUser userAdapter;
     private List<User> mUser;
     FirebaseUser fuser;
     DatabaseReference reference;
-    private  List<Chatlist>userList;
+    private List<Chatlist> userList;
     RecyclerView recyclerView;
     FirebaseAuth firebaseAuth;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_chatlist_,container,false);
+        View view = inflater.inflate(R.layout.fragment_chatlist_, container, false);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -60,7 +61,7 @@ public class ChatList_Fragment extends Fragment {private AdapterUser userAdapter
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 userList.clear();
-                for(DataSnapshot snapshot1 : snapshot.getChildren()){
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Chatlist chatlist = snapshot1.getValue(Chatlist.class);
                     userList.add(chatlist);
                 }
@@ -82,16 +83,16 @@ public class ChatList_Fragment extends Fragment {private AdapterUser userAdapter
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 mUser.clear();
-                for (DataSnapshot snapshot1 : snapshot.getChildren()){
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     User user = snapshot1.getValue(User.class);
-                    for (Chatlist chatlist : userList){
-                        if(user.getUid().equals(chatlist.getId())){
+                    for (Chatlist chatlist : userList) {
+                        if (user.getUid().equals(chatlist.getId())) {
                             mUser.add(user);
                         }
                     }
 
                 }
-                userAdapter = new AdapterUser(getContext(),mUser,true);
+                userAdapter = new AdapterUser(getContext(), mUser, true);
                 recyclerView.setAdapter(userAdapter);
 
             }
@@ -102,6 +103,7 @@ public class ChatList_Fragment extends Fragment {private AdapterUser userAdapter
             }
         });
     }
+
     private void searchChatlist(String query) {
 
         mUser = new ArrayList<>();
@@ -110,13 +112,12 @@ public class ChatList_Fragment extends Fragment {private AdapterUser userAdapter
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 mUser.clear();
-                for (DataSnapshot snapshot1 : snapshot.getChildren()){
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     User user = snapshot1.getValue(User.class);
-                    for (Chatlist chatlist : userList){
-                        if(user.getUid().equals(chatlist.getId())){
-                            if(user.getName().toLowerCase().contains(query.toLowerCase())||
-                                    user.getEmail().toLowerCase().contains(query.toLowerCase()))
-                            {
+                    for (Chatlist chatlist : userList) {
+                        if (user.getUid().equals(chatlist.getId())) {
+                            if (user.getName().toLowerCase().contains(query.toLowerCase()) ||
+                                    user.getEmail().toLowerCase().contains(query.toLowerCase())) {
                                 mUser.add(user);
                             }
                         }
@@ -124,7 +125,7 @@ public class ChatList_Fragment extends Fragment {private AdapterUser userAdapter
                     }
 
                 }
-                userAdapter = new AdapterUser(getContext(),mUser,true);
+                userAdapter = new AdapterUser(getContext(), mUser, true);
                 recyclerView.setAdapter(userAdapter);
 
             }
@@ -144,13 +145,13 @@ public class ChatList_Fragment extends Fragment {private AdapterUser userAdapter
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main,menu);
+        inflater.inflate(R.menu.menu_main, menu);
         menu.findItem(R.id.action_menu).setVisible(false);
         // SearchView
-        MenuItem item=menu.findItem(R.id.action_search);
+        MenuItem item = menu.findItem(R.id.action_search);
 
-        SearchView searchView=(SearchView) MenuItemCompat.getActionView(item);
-// search listener
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        // search listener
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {

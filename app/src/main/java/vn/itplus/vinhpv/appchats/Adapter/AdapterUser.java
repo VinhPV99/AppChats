@@ -19,9 +19,9 @@ import vn.itplus.vinhpv.appchats.activity.MessageActivity;
 import vn.itplus.vinhpv.appchats.Model.User;
 import vn.itplus.vinhpv.appchats.R;
 
-public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder>{
+public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder> {
     Context context;
-    List<User>userList;
+    List<User> userList;
     private boolean isChat;
 
     public AdapterUser(Context context, List<User> userList, boolean isChat) {
@@ -31,47 +31,47 @@ public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder>{
     }
 
     @Override
-    public MyHolder onCreateViewHolder(@NonNull  ViewGroup viewGroup, int viewType) {
+    public MyHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
 
-        View view = LayoutInflater.from(context).inflate(R.layout.row_user, viewGroup,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.row_user, viewGroup, false);
 
 
         return new AdapterUser.MyHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull  MyHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyHolder holder, int position) {
 
         // get data
-        String userID =userList.get(position).getUid();
-        String userImage =userList.get(position).getImage();
-        String userName =userList.get(position).getName();
-        String userEmail=userList.get(position).getEmail();
+        String userID = userList.get(position).getUid();
+        String userImage = userList.get(position).getImage();
+        String userName = userList.get(position).getName();
+        String userEmail = userList.get(position).getEmail();
 // set data
         holder.mNameTv.setText(userName);
         holder.mEmailTv.setText(userEmail);
         try {
             Picasso.get().load(userImage).placeholder(R.mipmap.avatar)
                     .into(holder.mAvatarTv);
-        }catch(Exception e){
-    }
+        } catch (Exception e) {
+        }
 
-        if(isChat){
-            if (userList.get(position).getStatus().equals("online")){
+        if (isChat) {
+            if (userList.get(position).getStatus().equals("online")) {
                 holder.imageViewON.setVisibility(View.VISIBLE);
                 holder.imageViewOFF.setVisibility(View.INVISIBLE);
-            }else {
+            } else {
                 holder.imageViewOFF.setVisibility(View.VISIBLE);
                 holder.imageViewON.setVisibility(View.INVISIBLE);
             }
-        }else {
+        } else {
             holder.imageViewON.setVisibility(View.INVISIBLE);
             holder.imageViewOFF.setVisibility(View.INVISIBLE);
         }
 
-        holder.itemView.setOnClickListener((v)->{
+        holder.itemView.setOnClickListener((v) -> {
             Intent intent = new Intent(context, MessageActivity.class);
-            intent.putExtra("uid",userID);
+            intent.putExtra("uid", userID);
             context.startActivity(intent);
         });
 
@@ -83,12 +83,12 @@ public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder>{
         return userList.size();
     }
 
-    class MyHolder extends RecyclerView.ViewHolder{
+    class MyHolder extends RecyclerView.ViewHolder {
 
-        ImageView mAvatarTv,imageViewON,imageViewOFF;
-        TextView mNameTv,mEmailTv;
+        ImageView mAvatarTv, imageViewON, imageViewOFF;
+        TextView mNameTv, mEmailTv;
 
-        public MyHolder(@NonNull  View itemView) {
+        public MyHolder(@NonNull View itemView) {
             super(itemView);
 
             mAvatarTv = itemView.findViewById(R.id.avatarTv);

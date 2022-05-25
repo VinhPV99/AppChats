@@ -1,9 +1,10 @@
 package vn.itplus.vinhpv.appchats.Model;
 
 public class User {
-    String name,email,search,phone,image,cover,uid,status;
+    String name, email, search, phone, image, cover, uid, status;
 
-    public User() { }
+    public User() {
+    }
 
     public String getName() {
         return name;

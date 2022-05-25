@@ -1,10 +1,10 @@
 package vn.itplus.vinhpv.appchats.Model;
 
 public class Chat {
-    private  String sender,receiver,message,timestamp;
+    private String sender, receiver, message, timestamp;
     private boolean isseen;
 
-    public Chat(String sender, String receiver, String message,String timestamp,boolean isseen) {
+    public Chat(String sender, String receiver, String message, String timestamp, boolean isseen) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
@@ -20,7 +20,8 @@ public class Chat {
         this.timestamp = timestamp;
     }
 
-    public Chat() {}
+    public Chat() {
+    }
 
     public boolean isIsseen() {
         return isseen;

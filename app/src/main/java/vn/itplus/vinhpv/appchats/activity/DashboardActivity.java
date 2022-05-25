@@ -23,7 +23,7 @@ import vn.itplus.vinhpv.appchats.Fragment.Profile_Fragment;
 import vn.itplus.vinhpv.appchats.Fragment.Users_Fragment;
 import vn.itplus.vinhpv.appchats.R;
 
-public class Dashboard extends AppCompatActivity {
+public class DashboardActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     ActionBar actionBar;
 
@@ -36,18 +36,6 @@ public class Dashboard extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-//        myRef = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
-//        myRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot datasnapshot) {
-//                User user = datasnapshot.getValue(User.class);
-//            }
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-
         // set title actionbar
         actionBar = getSupportActionBar();
         actionBar.setTitle("Dashboard");
@@ -60,21 +48,21 @@ public class Dashboard extends AppCompatActivity {
         actionBar.setTitle("Cuộc Trò Chuyện");
         ChatList_Fragment fragment1 = new ChatList_Fragment();
         FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
-        ft1.replace(R.id.content,fragment1,"");
+        ft1.replace(R.id.content, fragment1, "");
         ft1.commit();
     }
 
-    private  BottomNavigationView.OnNavigationItemSelectedListener selectedListener
+    private BottomNavigationView.OnNavigationItemSelectedListener selectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
-        public boolean onNavigationItemSelected(@NonNull  MenuItem item) {
-            switch (item.getItemId()){
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
                 case R.id.nav_home:
 
                     actionBar.setTitle("Trang chủ ");
                     Home_Fragment fragment = new Home_Fragment();
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    ft.replace(R.id.content,fragment,"");
+                    ft.replace(R.id.content, fragment, "");
                     ft.commit();
                     return true;
 
@@ -83,7 +71,7 @@ public class Dashboard extends AppCompatActivity {
                     actionBar.setTitle("Cuộc Trò Chuyện");
                     ChatList_Fragment fragment1 = new ChatList_Fragment();
                     FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
-                    ft1.replace(R.id.content,fragment1,"");
+                    ft1.replace(R.id.content, fragment1, "");
                     ft1.commit();
                     return true;
                 case R.id.nav_users:
@@ -91,15 +79,15 @@ public class Dashboard extends AppCompatActivity {
                     actionBar.setTitle("Người Dùng");
                     Users_Fragment fragment2 = new Users_Fragment();
                     FragmentTransaction ft2 = getSupportFragmentManager().beginTransaction();
-                    ft2.replace(R.id.content,fragment2,"");
+                    ft2.replace(R.id.content, fragment2, "");
                     ft2.commit();
                     return true;
                 case R.id.nav_profile:
 
                     actionBar.setTitle("Trang Cá Nhân");
-                   Profile_Fragment fragment3 = new Profile_Fragment();
+                    Profile_Fragment fragment3 = new Profile_Fragment();
                     FragmentTransaction ft3 = getSupportFragmentManager().beginTransaction();
-                    ft3.replace(R.id.content,fragment3,"");
+                    ft3.replace(R.id.content, fragment3, "");
                     ft3.commit();
                     return true;
             }
@@ -107,16 +95,13 @@ public class Dashboard extends AppCompatActivity {
         }
     };
 
-    private void checkUserStatus(){
+    private void checkUserStatus() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
-        if(user != null){
-//            mProfileTv.setText(user.getEmail());
-        }else {
-            startActivity(new Intent(Dashboard.this, MainActivity.class));
+        if (user == null) {
+            startActivity(new Intent(DashboardActivity.this, MainActivity.class));
             finish();
         }
     }
-
 
 
     @Override
@@ -125,17 +110,17 @@ public class Dashboard extends AppCompatActivity {
         finish();
     }
 
-    protected  void  onStart(){
+    protected void onStart() {
         checkUserStatus();
         super.onStart();
     }
 
 
     //check status
-    private void CheckStatus(String status){
+    private void CheckStatus(String status) {
         myRef = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
-        HashMap<String ,Object> hashMap = new HashMap<>();
-        hashMap.put("status",status);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
         myRef.updateChildren(hashMap);
     }
 

@@ -1,5 +1,8 @@
 package vn.itplus.vinhpv.appchats.Fragment;
 
+import static android.app.Activity.RESULT_OK;
+import static com.google.firebase.storage.FirebaseStorage.getInstance;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -9,12 +12,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -28,6 +25,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -47,11 +49,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
-import vn.itplus.vinhpv.appchats.activity.MainActivity;
 import vn.itplus.vinhpv.appchats.R;
-
-import static android.app.Activity.RESULT_OK;
-import static com.google.firebase.storage.FirebaseStorage.getInstance;
+import vn.itplus.vinhpv.appchats.activity.MainActivity;
 
 public class Profile_Fragment extends Fragment {
 
@@ -94,12 +93,8 @@ public class Profile_Fragment extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
         firebaseDatabase = FirebaseDatabase.getInstance();
-//        databaseReference = firebaseDatabase.getReference().child("Users");
         databaseReference = firebaseDatabase.getReference("Users");
         storageReference = getInstance().getReference();// firebase storage reference
-
-//        storageReference = FirebaseStorage.getInstance().getReference().child("image");
-//        storageReference = FirebaseStorage.getInstance().getReference().child("cover");
 
         // init arrays of permissions
         cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -233,9 +228,9 @@ public class Profile_Fragment extends Fragment {
         ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.TITLE, "Temp Pic");
         values.put(MediaStore.Images.Media.DESCRIPTION, "Temp Description");
-// put image uri
+        // put image uri
         imageUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-// intent to start camera
+        // intent to start camera
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         startActivityForResult(cameraIntent, IMAGE_PICK_CAMERA_CODE);
@@ -380,26 +375,6 @@ public class Profile_Fragment extends Fragment {
                 // image is picked from camera,get uri of image
                 uploadProfileCoverPhoto(imageUri);
             }
-//        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK
-//                && data != null && data.getData() != null) {
-//
-//            imageUri = data.getData();
-//            if (upLoadTask != null && upLoadTask.isInProgress()) {
-//                Toast.makeText(getContext(), "Đang tải ảnh", Toast.LENGTH_LONG).show();
-//            } else {
-//                UpLoadMyImage();
-//            }
-//        }
-//        if (requestCode == REQUEST_CODE2 && resultCode == RESULT_OK
-//                && data != null && data.getData() != null) {
-//
-//            imageUri = data.getData();
-//            if (upLoadTask != null && upLoadTask.isInProgress()) {
-//                Toast.makeText(getContext(), "Đang tải ảnh", Toast.LENGTH_LONG).show();
-//            } else {
-//                UpLoadMyCover();
-//            }
-//        }
         }
     }
 
@@ -415,7 +390,7 @@ public class Profile_Fragment extends Fragment {
                         Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                         while (!uriTask.isSuccessful()) ;
                         Uri downloadUri = uriTask.getResult();
-// check if image is uploaded or not and url is received
+                        // check if image is uploaded or not and url is received
                         if (uriTask.isSuccessful()) {
                             // image uploaded
                             // add/update url in user's database
@@ -455,11 +430,11 @@ public class Profile_Fragment extends Fragment {
                 });
     }
 
-    private void checkUserStatus(){
+    private void checkUserStatus() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
-        if(user != null){
+        if (user != null) {
 //            mProfileTv.setText(user.getEmail());
-        }else {
+        } else {
             startActivity(new Intent(getActivity(), MainActivity.class));
             getActivity().finish();
         }
@@ -473,7 +448,7 @@ public class Profile_Fragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_main,menu);
+        inflater.inflate(R.menu.menu_main, menu);
         menu.findItem(R.id.action_search).setVisible(false);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -481,7 +456,7 @@ public class Profile_Fragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.action_menu){
+        if (id == R.id.action_menu) {
             firebaseAuth.signOut();
             checkUserStatus();
         }

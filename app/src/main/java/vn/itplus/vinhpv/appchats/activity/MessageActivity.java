@@ -37,7 +37,7 @@ import vn.itplus.vinhpv.appchats.Model.Chat;
 import vn.itplus.vinhpv.appchats.R;
 
 public class MessageActivity extends AppCompatActivity {
-    TextView username,mStatus;
+    TextView username, mStatus;
     ImageView imgChat;
     EditText msg_editText;
     ImageButton sendBtn;
@@ -64,7 +64,7 @@ public class MessageActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
         username = findViewById(R.id.tvChat);
         imgChat = findViewById(R.id.imgChat);
-        sendBtn= findViewById(R.id.btn_send);
+        sendBtn = findViewById(R.id.btn_send);
         msg_editText = findViewById(R.id.text_send);
         mStatus = findViewById(R.id.online_status);
 
@@ -75,11 +75,11 @@ public class MessageActivity extends AppCompatActivity {
 
 
         intent = getIntent();
-        userid= intent.getStringExtra("uid");
+        userid = intent.getStringExtra("uid");
 
         // firebase auth instance
         firebaseAuth = FirebaseAuth.getInstance();
-        firebaseDatabase =FirebaseDatabase.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
         reference = firebaseDatabase.getReference("Users");
         fuser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -91,29 +91,27 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // check until required ifo is received
-                for(DataSnapshot ds: snapshot.getChildren()){
+                for (DataSnapshot ds : snapshot.getChildren()) {
                     // get data
-                    String name=""+ds.child("name").getValue();
-                    hisImage =""+ds.child("image").getValue();
-                    String onLineStatus = ""+ds.child("onlineStatus").getValue();
+                    String name = "" + ds.child("name").getValue();
+                    hisImage = "" + ds.child("image").getValue();
+                    String onLineStatus = "" + ds.child("onlineStatus").getValue();
                     // set data
                     username.setText(name);
-                    if(onLineStatus.equals("online")){
+                    if (onLineStatus.equals("online")) {
                         mStatus.setText(onLineStatus);
-                    }
-                    else{
+                    } else {
                         // convert timestamp to proper time date
                         // convert time stamp to dd/mm/yyyy hh:mm am/pm
-                        Calendar cal=Calendar.getInstance(Locale.ENGLISH);
+                        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
                         cal.setTimeInMillis(Long.parseLong(onLineStatus));
-                        String dateTime= DateFormat.format("dd/MM/yyyy hh:mm aa",cal).toString();
+                        String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa", cal).toString();
                         mStatus.setText(dateTime);
                     }
-                    try{
+                    try {
                         // image received,set it to imageview in toolbar
                         Picasso.get().load(hisImage).placeholder(R.mipmap.avatar).into(imgChat);
-                    }
-                    catch(Exception e){
+                    } catch (Exception e) {
                         // there is exception getting picture,set default picture
                         Picasso.get().load(R.mipmap.avatar).into(imgChat);
                     }
@@ -142,51 +140,51 @@ public class MessageActivity extends AppCompatActivity {
         SeenMessage();
     }
 
-    private void SeenMessage(){
+    private void SeenMessage() {
         reference = FirebaseDatabase.getInstance().getReference("Chats");
         seenListener = reference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull  DataSnapshot snapshot) {
-                for(DataSnapshot snapshot1: snapshot.getChildren()){
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Chat chat = snapshot1.getValue(Chat.class);
-                    if(chat.getReceiver().equals(myUid)&& chat.getSender().equals(userid)){
-                        HashMap<String,Object> hasSeenHashMap= new HashMap<>();
-                        hasSeenHashMap.put("isseen",true);
+                    if (chat.getReceiver().equals(myUid) && chat.getSender().equals(userid)) {
+                        HashMap<String, Object> hasSeenHashMap = new HashMap<>();
+                        hasSeenHashMap.put("isseen", true);
                         snapshot1.getRef().updateChildren(hasSeenHashMap);
                     }
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull  DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
     }
 
-    private void sendMessage( String message) {
+    private void sendMessage(String message) {
 
-      DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
         String timestamp = String.valueOf(System.currentTimeMillis());
 
-        HashMap<String,Object>hashMap = new HashMap<>();
-        hashMap.put("sender",myUid);
-        hashMap.put("receiver",userid);
-        hashMap.put("message",message);
-        hashMap.put("timestamp",timestamp);
-        hashMap.put("isseen",false);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("sender", myUid);
+        hashMap.put("receiver", userid);
+        hashMap.put("message", message);
+        hashMap.put("timestamp", timestamp);
+        hashMap.put("isseen", false);
 
         databaseReference.child("Chats").push().setValue(hashMap);
         msg_editText.setText("");
 
-        final DatabaseReference chatRef =FirebaseDatabase.getInstance().getReference("ChatList")
+        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("ChatList")
                 .child(fuser.getUid()).child(userid);
 
         chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(!snapshot.exists()){
+                if (!snapshot.exists()) {
                     chatRef.child("id").setValue(userid);
                 }
             }
@@ -200,31 +198,31 @@ public class MessageActivity extends AppCompatActivity {
 
     }
 
-    private void checkUserStatus(){
+    private void checkUserStatus() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
-        if(user != null){
+        if (user != null) {
             myUid = user.getUid();
-        }else {
+        } else {
             startActivity(new Intent(this, MainActivity.class));
             finish();
         }
     }
 
-    private void readMessage(){
-        mChat= new ArrayList<>();
+    private void readMessage() {
+        mChat = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference("Chats");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull  DataSnapshot snapshot) {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 mChat.clear();
-                for(DataSnapshot snapshot1 : snapshot.getChildren()){
-                    Chat chat  =snapshot1.getValue(Chat.class);
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    Chat chat = snapshot1.getValue(Chat.class);
 
-                    if(chat.getReceiver().equals(myUid)&& chat.getSender().equals(userid)||
-                            chat.getReceiver().equals(userid)&& chat.getSender().equals(myUid)){
+                    if (chat.getReceiver().equals(myUid) && chat.getSender().equals(userid) ||
+                            chat.getReceiver().equals(userid) && chat.getSender().equals(myUid)) {
                         mChat.add(chat);
                     }
-                    messageAdapter = new MessageAdapter(MessageActivity.this,mChat,hisImage);
+                    messageAdapter = new MessageAdapter(MessageActivity.this, mChat, hisImage);
                     messageAdapter.notifyDataSetChanged();
                     recyclerView.setAdapter(messageAdapter);
                 }
@@ -236,16 +234,18 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
     }
-    private void CheckStatus(String status){
+
+    private void CheckStatus(String status) {
         reference = FirebaseDatabase.getInstance().getReference("Users").child(myUid);
-        HashMap<String ,Object> hashMap = new HashMap<>();
-        hashMap.put("onlineStatus",status);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("onlineStatus", status);
         reference.updateChildren(hashMap);
     }
-    private void setStatus(String status){
+
+    private void setStatus(String status) {
         reference = FirebaseDatabase.getInstance().getReference("Users").child(myUid);
-        HashMap<String ,Object> hashMap = new HashMap<>();
-        hashMap.put("status",status);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status", status);
         reference.updateChildren(hashMap);
     }
 
@@ -269,7 +269,7 @@ public class MessageActivity extends AppCompatActivity {
         super.onPause();
         reference.removeEventListener(seenListener);
         // get timestamp
-        String timestamp= String.valueOf(System.currentTimeMillis());
+        String timestamp = String.valueOf(System.currentTimeMillis());
         CheckStatus(timestamp);
         setStatus("offline");
     }

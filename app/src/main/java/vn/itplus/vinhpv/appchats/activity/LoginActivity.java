@@ -1,9 +1,5 @@
 package vn.itplus.vinhpv.appchats.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -18,6 +14,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -27,9 +27,9 @@ import com.google.firebase.auth.FirebaseUser;
 
 import vn.itplus.vinhpv.appchats.R;
 
-public class Login extends AppCompatActivity {
-    EditText EmailET,PasswordET;
-    Button LoginBtn,RegisterBtn;
+public class LoginActivity extends AppCompatActivity {
+    EditText EmailET, PasswordET;
+    Button LoginBtn, RegisterBtn;
     TextView mRecoverPassTv;
 
     private FirebaseAuth mAuth;
@@ -42,14 +42,14 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // Actionbar and its title
-        ActionBar actionBar=getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("Login");
         // enable back button
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
 
         mAuth = FirebaseAuth.getInstance();
-//init
+        //init
         LoginBtn = findViewById(R.id.buttonLogin);
         RegisterBtn = findViewById(R.id.buttonRegisterLG);
         EmailET = findViewById(R.id.userLoginEdittext);
@@ -59,7 +59,7 @@ public class Login extends AppCompatActivity {
         RegisterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(Login.this,Register.class));
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
                 finish();
             }
         });
@@ -69,12 +69,11 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
                 String email = EmailET.getText().toString().trim();
                 String pass = PasswordET.getText().toString().trim();
-                if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     EmailET.setError("Email không hợp lệ !!!");
                     EmailET.setFocusable(true);
-                }
-                else {
-                    loginUser(email,pass);
+                } else {
+                    loginUser(email, pass);
                 }
             }
         });
@@ -100,7 +99,7 @@ public class Login extends AppCompatActivity {
         emailEt.setMinEms(16);
 
         linearLayout.addView(emailEt);
-        linearLayout.setPadding(10,10,10,10);
+        linearLayout.setPadding(10, 10, 10, 10);
         showRecoverPass.setView(linearLayout);
 
         showRecoverPass.setPositiveButton("Gửi", new DialogInterface.OnClickListener() {
@@ -128,16 +127,16 @@ public class Login extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         progressDialog.dismiss();
-                        if(task.isSuccessful()){
-                            Toast.makeText(Login.this,"Đã Gửi tới email",Toast.LENGTH_SHORT).show();
-                        }else {
-                            Toast.makeText(Login.this,"Gửi thất bại",Toast.LENGTH_SHORT).show();
+                        if (task.isSuccessful()) {
+                            Toast.makeText(LoginActivity.this, "Đã Gửi tới email", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Gửi thất bại", Toast.LENGTH_SHORT).show();
                         }
 
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onFailure(@NonNull  Exception e) {
+            public void onFailure(@NonNull Exception e) {
                 progressDialog.dismiss();
             }
         });
@@ -146,19 +145,19 @@ public class Login extends AppCompatActivity {
     private void loginUser(String email, String pass) {
         progressDialog.setMessage("Đang đăng nhập...");
         progressDialog.show();
-        mAuth.signInWithEmailAndPassword(email,pass)
+        mAuth.signInWithEmailAndPassword(email, pass)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             progressDialog.dismiss();
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Toast.makeText(Login.this,"Đăng nhập thành công",Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(Login.this, Dashboard.class));
+                            Toast.makeText(LoginActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
                             finish();
-                        }else {
+                        } else {
                             progressDialog.dismiss();
-                            Toast.makeText(Login.this,"Đăng nhập thất bại!!",Toast.LENGTH_LONG).show();
+                            Toast.makeText(LoginActivity.this, "Đăng nhập thất bại!!", Toast.LENGTH_LONG).show();
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {

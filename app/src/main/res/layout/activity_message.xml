@@ -55,6 +55,7 @@
         android:layout_below="@id/toolBar"
         android:layout_marginTop="0dp"
         android:layout_marginBottom="8dp" />
+
     <LinearLayout
         android:id="@+id/chatLayout"
         android:layout_width="match_parent"
@@ -63,6 +64,7 @@
         android:background="@color/white"
         android:gravity="center"
         android:orientation="horizontal">
+
         <EditText
             android:id="@+id/text_send"
             android:layout_width="0dp"
@@ -70,8 +72,8 @@
             android:layout_weight="1"
             android:background="@drawable/background_left"
             android:hint="Message..."
-            android:padding="15dp"
-            android:inputType="textCapSentences"/>
+            android:inputType="textCapSentences"
+            android:padding="15dp" />
 
         <ImageButton
             android:id="@+id/btn_send"
