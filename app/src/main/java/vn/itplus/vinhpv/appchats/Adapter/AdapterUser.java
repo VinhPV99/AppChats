@@ -11,11 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import vn.itplus.vinhpv.appchats.MessageActivity;
+import vn.itplus.vinhpv.appchats.activity.MessageActivity;
 import vn.itplus.vinhpv.appchats.Model.User;
 import vn.itplus.vinhpv.appchats.R;
 
@@ -41,20 +41,23 @@ public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull  MyHolder holder, int position) {
-        User userName = userList.get(position);
-        User userEmail = userList.get(position);
 
-        holder.mNameTv.setText(userName.getName());
-        holder.mEmailTv.setText(userEmail.getEmail());
-        if(userName.getImage().equals("")){
-            holder.mAvatarTv.setImageResource(R.mipmap.avatar);
-        }else {
-            Glide.with(context).load(userName.getImage())
+        // get data
+        String userID =userList.get(position).getUid();
+        String userImage =userList.get(position).getImage();
+        String userName =userList.get(position).getName();
+        String userEmail=userList.get(position).getEmail();
+// set data
+        holder.mNameTv.setText(userName);
+        holder.mEmailTv.setText(userEmail);
+        try {
+            Picasso.get().load(userImage).placeholder(R.mipmap.avatar)
                     .into(holder.mAvatarTv);
-        }
+        }catch(Exception e){
+    }
 
         if(isChat){
-            if (userName.getStatus().equals("online")){
+            if (userList.get(position).getStatus().equals("online")){
                 holder.imageViewON.setVisibility(View.VISIBLE);
                 holder.imageViewOFF.setVisibility(View.INVISIBLE);
             }else {
@@ -66,9 +69,9 @@ public class AdapterUser extends RecyclerView.Adapter<AdapterUser.MyHolder>{
             holder.imageViewOFF.setVisibility(View.INVISIBLE);
         }
 
-        holder.mAvatarTv.setOnClickListener((v)->{
+        holder.itemView.setOnClickListener((v)->{
             Intent intent = new Intent(context, MessageActivity.class);
-            intent.putExtra("uid",userName.getUid());
+            intent.putExtra("uid",userID);
             context.startActivity(intent);
         });
 

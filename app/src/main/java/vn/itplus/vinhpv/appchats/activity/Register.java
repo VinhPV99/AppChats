@@ -1,8 +1,4 @@
-package vn.itplus.vinhpv.appchats;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+package vn.itplus.vinhpv.appchats.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -13,6 +9,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -25,6 +25,11 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 
+import vn.itplus.vinhpv.appchats.R;
+
+/**
+ * VinhPV Lớp đăng ký tài khoản
+ */
 public class Register extends AppCompatActivity {
     EditText txtEmail,txtPass;
     Button btnRegister;
@@ -79,6 +84,7 @@ public class Register extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Register.this,Login.class));
+                finish();
             }
         });
     }
@@ -101,6 +107,8 @@ public class Register extends AppCompatActivity {
                             hashMap.put("email",email);
                             hashMap.put("uid",uid);
                             hashMap.put("name","");
+                            hashMap.put("onlineStatus","online");
+                            hashMap.put("status","online");
                             hashMap.put("phone","");
                             hashMap.put("image","");
                             hashMap.put("cover","");

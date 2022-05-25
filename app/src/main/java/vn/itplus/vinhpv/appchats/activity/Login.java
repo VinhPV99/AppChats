@@ -1,6 +1,7 @@
-package vn.itplus.vinhpv.appchats;
+package vn.itplus.vinhpv.appchats.activity;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
@@ -24,6 +25,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import vn.itplus.vinhpv.appchats.R;
+
 public class Login extends AppCompatActivity {
     EditText EmailET,PasswordET;
     Button LoginBtn,RegisterBtn;
@@ -31,15 +34,22 @@ public class Login extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
 
-    ProgressDialog pg;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        mAuth = FirebaseAuth.getInstance();
+        // Actionbar and its title
+        ActionBar actionBar=getSupportActionBar();
+        actionBar.setTitle("Login");
+        // enable back button
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
 
+        mAuth = FirebaseAuth.getInstance();
+//init
         LoginBtn = findViewById(R.id.buttonLogin);
         RegisterBtn = findViewById(R.id.buttonRegisterLG);
         EmailET = findViewById(R.id.userLoginEdittext);
@@ -75,7 +85,7 @@ public class Login extends AppCompatActivity {
             }
         });
 
-        pg = new ProgressDialog(this);
+        progressDialog = new ProgressDialog(this);
     }
 
     private void showRecoverPasswordDialog() {
@@ -111,13 +121,13 @@ public class Login extends AppCompatActivity {
     }
 
     private void setRecoverPass(String email) {
-        pg.setMessage("Đang Gửi...");
-        pg.show();
+        progressDialog.setMessage("Đang Gửi...");
+        progressDialog.show();
         mAuth.sendPasswordResetEmail(email)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        pg.dismiss();
+                        progressDialog.dismiss();
                         if(task.isSuccessful()){
                             Toast.makeText(Login.this,"Đã Gửi tới email",Toast.LENGTH_SHORT).show();
                         }else {
@@ -128,33 +138,33 @@ public class Login extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull  Exception e) {
-                pg.dismiss();
+                progressDialog.dismiss();
             }
         });
     }
 
     private void loginUser(String email, String pass) {
-        pg.setMessage("Đang đăng nhập...");
-        pg.show();
+        progressDialog.setMessage("Đang đăng nhập...");
+        progressDialog.show();
         mAuth.signInWithEmailAndPassword(email,pass)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            pg.dismiss();
+                            progressDialog.dismiss();
                             FirebaseUser user = mAuth.getCurrentUser();
                             Toast.makeText(Login.this,"Đăng nhập thành công",Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(Login.this, Dashboard.class));
                             finish();
                         }else {
-                            pg.dismiss();
+                            progressDialog.dismiss();
                             Toast.makeText(Login.this,"Đăng nhập thất bại!!",Toast.LENGTH_LONG).show();
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                pg.dismiss();
+                progressDialog.dismiss();
             }
         });
     }

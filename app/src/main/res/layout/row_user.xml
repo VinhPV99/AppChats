@@ -27,7 +27,7 @@
         android:layout_marginTop="60dp"
         app:layout_constraintLeft_toRightOf="@+id/avatarTv"
         app:layout_constraintTop_toTopOf="parent"/>
-    <ImageView
+    <com.blogspot.atifsoftwares.circularimageview.CircularImageView
         android:id="@+id/avatarTv"
         android:layout_width="72dp"
         android:layout_height="72dp"

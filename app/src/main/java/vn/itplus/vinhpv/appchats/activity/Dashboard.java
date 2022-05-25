@@ -1,30 +1,27 @@
-package vn.itplus.vinhpv.appchats;
+package vn.itplus.vinhpv.appchats.activity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
 import vn.itplus.vinhpv.appchats.Fragment.ChatList_Fragment;
+import vn.itplus.vinhpv.appchats.Fragment.Home_Fragment;
 import vn.itplus.vinhpv.appchats.Fragment.Profile_Fragment;
 import vn.itplus.vinhpv.appchats.Fragment.Users_Fragment;
-import vn.itplus.vinhpv.appchats.Model.User;
+import vn.itplus.vinhpv.appchats.R;
 
 public class Dashboard extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
@@ -39,17 +36,17 @@ public class Dashboard extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        myRef = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot datasnapshot) {
-                User user = datasnapshot.getValue(User.class);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+//        myRef = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+//        myRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot datasnapshot) {
+//                User user = datasnapshot.getValue(User.class);
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
         // set title actionbar
         actionBar = getSupportActionBar();
@@ -73,6 +70,15 @@ public class Dashboard extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull  MenuItem item) {
             switch (item.getItemId()){
                 case R.id.nav_home:
+
+                    actionBar.setTitle("Trang chủ ");
+                    Home_Fragment fragment = new Home_Fragment();
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.content,fragment,"");
+                    ft.commit();
+                    return true;
+
+                case R.id.nav_chats:
 
                     actionBar.setTitle("Cuộc Trò Chuyện");
                     ChatList_Fragment fragment1 = new ChatList_Fragment();
@@ -104,12 +110,14 @@ public class Dashboard extends AppCompatActivity {
     private void checkUserStatus(){
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if(user != null){
-            //mProfileTv.setText(user.getEmail());
+//            mProfileTv.setText(user.getEmail());
         }else {
             startActivity(new Intent(Dashboard.this, MainActivity.class));
             finish();
         }
     }
+
+
 
     @Override
     public void onBackPressed() {
@@ -121,22 +129,7 @@ public class Dashboard extends AppCompatActivity {
         checkUserStatus();
         super.onStart();
     }
-        //option Menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main,menu);
-        return super.onCreateOptionsMenu(menu);
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if(id == R.id.action_menu){
-            firebaseAuth.signOut();
-            checkUserStatus();
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     //check status
     private void CheckStatus(String status){

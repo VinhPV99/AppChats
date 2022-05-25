@@ -8,14 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.Glide;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,26 +24,26 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 import vn.itplus.vinhpv.appchats.Model.Chat;
 import vn.itplus.vinhpv.appchats.R;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder>{
+
+    public static final int MSG_TYPE_LEFT=0;
+    public static final int MSG_TYPE_RIGHT=1;
+
     private Context context;
     private List<Chat>mChat;
     private String imgURL;
     FirebaseUser fuser;
-    String myUID;
 
-
-    public static final int MSG_TYPE_LEFT=0;
-    public static final int MSG_TYPE_RIGHT=1;
 
     public MessageAdapter(Context context, List<Chat> mChat, String imgURL) {
         this.context = context;
@@ -69,12 +68,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-
-
+    public void onBindViewHolder(@NonNull ViewHolder holder,  final int position) {
+        // get data
         String chat= mChat.get(position).getMessage();
         String timestamp = mChat.get(position).getTimestamp();
-
+        // format time stamp
         Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
         calendar.setTimeInMillis(Long.parseLong(timestamp));
         String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa",calendar).toString();
@@ -82,11 +80,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         holder.timeTv.setText(dateTime);
         holder.show_mesage.setText(chat);
 
-        if("".equals(imgURL)){
-            holder.profile_image.setImageResource(R.mipmap.avatar);
-        }else {
-            Glide.with(context).load(imgURL).into(holder.profile_image);
+        try{
+            Picasso.get().load(imgURL).into(holder.profile_image);
         }
+        catch(Exception e){
+
+        }
+
         if (position==mChat.size() -1){
             if(mChat.get(position).isIsseen()){
                 holder.txt_seen.setText("Đã xem");
@@ -99,9 +99,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         }
 
         //Delete
-        holder.messageLayout.setOnClickListener(new View.OnClickListener() {
+        holder.show_mesage.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Xóa, Gỡ bỏ");
                 builder.setMessage("Bạn có muốn xóa tin nhắn này ??");
@@ -118,17 +118,25 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                     }
                 });
                 builder.create().show();
+                return true;
             }
         });
 
+//        holder.show_mesage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+
     }
 
-    private void deleteMessage(int i) {
-        myUID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    private void deleteMessage(int position) {
+       String myUID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        String msgTimestamp = mChat.get(i).getTimestamp();
+        String msgTimestamp = mChat.get(position).getTimestamp();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Chats");
-        Query query = databaseReference.child("timestamp").equalTo(msgTimestamp);
+        Query query = databaseReference.orderByChild("timestamp").equalTo(msgTimestamp);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull  DataSnapshot snapshot) {
@@ -136,17 +144,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
                     if(snapshot1.child("sender").getValue().equals(myUID)){
                         //cách xoa msg1
-                      //snapshot1.getRef().removeValue();
+                      snapshot1.getRef().removeValue();
 
                         //cách xoa msg2
-                        HashMap<String,Object> hashMap = new HashMap<>();
-                        hashMap.put("message"," Tin nhắn đã bị xóa....");
-                       snapshot1.getRef().updateChildren(hashMap);
+//                        HashMap<String,Object> hashMap = new HashMap<>();
+//                        hashMap.put("message"," Tin nhắn đã bị xóa....");
+//                       snapshot1.getRef().updateChildren(hashMap);
 
-
-                        Toast.makeText(context,"Tin nhắn đã được xóa..",Toast.LENGTH_SHORT).show();
                     }else {
-                        Toast.makeText(context,"Tin nhắn đã bị xóa..",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context,"Bạn chỉ có thể xóa tin nhắn của mình ...",Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -165,12 +171,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         return mChat.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
-        public TextView show_mesage;
-        public ImageView profile_image;
-        public TextView txt_seen,timeTv;
+    @Override
+    public int getItemViewType(int position) {
+        fuser = FirebaseAuth.getInstance().getCurrentUser();
+        if (mChat.get(position).getSender().equals(fuser.getUid())) {
+            return MSG_TYPE_RIGHT;
+        } else {
+            return MSG_TYPE_LEFT;
+        }
+    }
 
-        RelativeLayout messageLayout;
+    public class ViewHolder extends RecyclerView.ViewHolder{
+        public ImageView profile_image;
+        public TextView show_mesage,txt_seen,timeTv;
+        LinearLayout messageLayout;
 
 
         public ViewHolder(@NonNull View itemView) {
@@ -185,13 +199,4 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         }
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        fuser = FirebaseAuth.getInstance().getCurrentUser();
-        if(mChat.get(position).getSender().equals(fuser.getUid())){
-            return MSG_TYPE_RIGHT;
-        }else {
-            return MSG_TYPE_LEFT;
-        }
-    }
 }
