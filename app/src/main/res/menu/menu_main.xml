@@ -11,8 +11,4 @@
             android:title="Đăng Xuất"
             android:icon="@drawable/ic_log_out"
             app:showAsAction="always"/>
-        <item android:id="@+id/action_post"
-            android:title=" Thêm Bài Viết"
-            android:icon="@drawable/ic_add_post"
-            app:showAsAction="always"/>
 </menu>

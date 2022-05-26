@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,8 +29,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -47,8 +52,12 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import vn.itplus.vinhpv.appchats.Adapter.PostAdapter;
+import vn.itplus.vinhpv.appchats.Model.Post;
 import vn.itplus.vinhpv.appchats.R;
 import vn.itplus.vinhpv.appchats.activity.AddPostActivity;
 import vn.itplus.vinhpv.appchats.activity.MainActivity;
@@ -64,6 +73,10 @@ public class ProfileFragment extends Fragment {
     String cameraPermissions[];
     String storagePermissions[];
 
+    List<Post>mPostList;
+    PostAdapter mPostAdapter;
+    String mUid;
+
     FirebaseAuth firebaseAuth;
     FirebaseUser user;
     FirebaseDatabase firebaseDatabase;
@@ -73,12 +86,12 @@ public class ProfileFragment extends Fragment {
     // path where images of user profile and cover will be stored
     String storagePath = "Users_Profile_Cover_Imgs/";
 
-    FloatingActionButton fab;
+    FloatingActionButton mAddPostButton;
     ProgressDialog pd;
-
+    RecyclerView mPostRecyclerView;
     ImageView avatarTv, coverTV;
     TextView nameTv, emailTv, phoneTv;
-
+    ImageButton mEditInfo;
     String profileCover;
     Uri imageUri;
 
@@ -101,14 +114,43 @@ public class ProfileFragment extends Fragment {
         cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         storagePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
-        fab = view.findViewById(R.id.fab);
+        mAddPostButton = view.findViewById(R.id.fab);
         pd = new ProgressDialog(getActivity());
         avatarTv = view.findViewById(R.id.avatarTv);
         coverTV = view.findViewById(R.id.coverTV);
         nameTv = view.findViewById(R.id.nameTv);
         phoneTv = view.findViewById(R.id.phoneTv);
         emailTv = view.findViewById(R.id.emailTv);
+        mEditInfo = view.findViewById(R.id.edit_profile);
+        mPostRecyclerView = view.findViewById(R.id.postProfile);
 
+        queryData();
+
+        //edit info
+        mEditInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showEditProfileDialog();
+            }
+        });
+
+        //fab buttom click
+        mAddPostButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //add post
+                startActivity(new Intent(getActivity(), AddPostActivity.class));
+            }
+        });
+
+        mPostList = new ArrayList<>();
+
+        checkUserStatus();
+        loadMyPosts();
+        return view;
+    }
+
+    private void queryData() {
         Query query = databaseReference.orderByChild("email").equalTo(user.getEmail());
         query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -145,16 +187,61 @@ public class ProfileFragment extends Fragment {
 
             }
         });
+    }
 
-        //fab buttom click
-        fab.setOnClickListener(new View.OnClickListener() {
+    private void loadMyPosts() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        mPostRecyclerView.setLayoutManager(layoutManager);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
+        Query query = databaseReference.orderByChild("uid").equalTo(mUid);
+        query.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                showEditProfileDialog();
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                mPostList.clear();
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    Post modelPost = ds.getValue(Post.class);
+                    mPostList.add(modelPost);
+                    mPostAdapter = new PostAdapter(getActivity(),mPostList);
+                    mPostRecyclerView.setAdapter(mPostAdapter);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
+    }
 
-        return view;
+    private void searchMyPosts(String search) {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        mPostRecyclerView.setLayoutManager(layoutManager);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
+        Query query = databaseReference.orderByChild("uid").equalTo(mUid);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    Post modelPost = ds.getValue(Post.class);
+                    if(modelPost.getpTitle().toLowerCase().contains(search.toLowerCase())||
+                    modelPost.getpDescr().toLowerCase().contains(search.toLowerCase())){
+                        mPostList.add(modelPost);
+                    }
+
+                    mPostAdapter = new PostAdapter(getActivity(),mPostList);
+                    mPostRecyclerView.setAdapter(mPostAdapter);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private boolean checkStoragePermission() {
@@ -316,6 +403,25 @@ public class ProfileFragment extends Fragment {
                                     pd.dismiss();
                                 }
                             });
+
+                    if(key.equals("name")){
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
+                        Query query = databaseReference.orderByChild("uid").equalTo(mUid);
+                        query.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot ds : snapshot.getChildren()){
+                                    String child = ds.getKey();
+                                    snapshot.getRef().child(child).child("uName").setValue(value);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
                 } else {
                     Toast.makeText(getActivity(), "Chọn" + key, Toast.LENGTH_SHORT).show();
                 }
@@ -416,6 +522,24 @@ public class ProfileFragment extends Fragment {
                                             pd.dismiss();
                                         }
                                     });
+                            if(profileCover.equals("image")){
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
+                                Query query = databaseReference.orderByChild("uid").equalTo(mUid);
+                                query.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        for (DataSnapshot ds : snapshot.getChildren()){
+                                            String child = ds.getKey();
+                                            snapshot.getRef().child(child).child("uDp").setValue(downloadUri.toString());
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                            }
                         } else {
                             // error
                             pd.dismiss();
@@ -434,7 +558,7 @@ public class ProfileFragment extends Fragment {
     private void checkUserStatus() {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
-//            mProfileTv.setText(user.getEmail());
+            mUid = user.getUid();
         } else {
             startActivity(new Intent(getActivity(), MainActivity.class));
             getActivity().finish();
@@ -450,7 +574,29 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
-        menu.findItem(R.id.action_search).setVisible(false);
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if(!TextUtils.isEmpty(query)){
+                    searchMyPosts(query);
+                }else{
+                    loadMyPosts();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if(!TextUtils.isEmpty(newText)){
+                    searchMyPosts(newText);
+                }else{
+                    loadMyPosts();
+                }
+                return false;
+            }
+        });
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -460,9 +606,6 @@ public class ProfileFragment extends Fragment {
         if (id == R.id.action_log_out) {
             firebaseAuth.signOut();
             checkUserStatus();
-        }
-        if (id == R.id.action_post) {
-            startActivity(new Intent(getActivity(), AddPostActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

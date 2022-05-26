@@ -1,6 +1,7 @@
 package vn.itplus.vinhpv.appchats.Adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,15 +10,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import vn.itplus.vinhpv.appchats.activity.MessageActivity;
 import vn.itplus.vinhpv.appchats.Model.User;
 import vn.itplus.vinhpv.appchats.R;
+import vn.itplus.vinhpv.appchats.activity.MessageActivity;
+import vn.itplus.vinhpv.appchats.activity.ThereProfileActivity;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyHolder> {
     Context context;
@@ -70,9 +73,25 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyHolder> {
         }
 
         holder.itemView.setOnClickListener((v) -> {
-            Intent intent = new Intent(context, MessageActivity.class);
-            intent.putExtra("uid", userID);
-            context.startActivity(intent);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setItems(new String[]{"Profile", "Chat"}, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which == 0) {
+                        //profile click
+                        Intent intent = new Intent(context, ThereProfileActivity.class);
+                        intent.putExtra("uid", userID);
+                        context.startActivity(intent);
+                    }
+                    if (which == 1) {
+                        //chat click
+                        Intent intent = new Intent(context, MessageActivity.class);
+                        intent.putExtra("uid", userID);
+                        context.startActivity(intent);
+                    }
+                }
+            });
+            builder.create().show();
         });
 
 

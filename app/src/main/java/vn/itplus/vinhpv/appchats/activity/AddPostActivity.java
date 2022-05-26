@@ -26,6 +26,8 @@ import androidx.core.content.ContextCompat;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,6 +44,7 @@ import vn.itplus.vinhpv.appchats.R;
 
 public class AddPostActivity extends AppCompatActivity {
     DatabaseReference userDbRef;
+    FirebaseAuth firebaseAuth;
 
     ActionBar actionBar;
     // views
@@ -73,6 +76,10 @@ public class AddPostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_post);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        checkUserStatus();
+
         actionBar = getSupportActionBar();
         actionBar.setTitle("Thêm Bài Viết");
         // enable back button in actionbar
@@ -387,6 +394,17 @@ public class AddPostActivity extends AppCompatActivity {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void checkUserStatus() {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+            email = user.getEmail();
+            uid = user.getUid();
+        } else {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+        }
     }
 
     @Override

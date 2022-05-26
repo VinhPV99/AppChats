@@ -1,6 +1,7 @@
 package vn.itplus.vinhpv.appchats.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +24,7 @@ import java.util.Locale;
 
 import vn.itplus.vinhpv.appchats.Model.Post;
 import vn.itplus.vinhpv.appchats.R;
+import vn.itplus.vinhpv.appchats.activity.ThereProfileActivity;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
 
@@ -111,6 +114,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                 Toast.makeText(context, "Share", Toast.LENGTH_SHORT).show();
             }
         });
+
+        holder.profileLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, ThereProfileActivity.class);
+                intent.putExtra("uid",uid);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -125,7 +137,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         TextView uNameTv, pTimeTv, pTitleTv, pDescriptionTv, pLikesTv;
         ImageButton moreBtn;
         Button likeBtn, commentBtn, shareBtn;
-
+        LinearLayout profileLayout;
         public MyHolder(@NonNull View itemView) {
             super(itemView);
             // init views
@@ -140,6 +152,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             likeBtn = itemView.findViewById(R.id.likeBtn);
             commentBtn = itemView.findViewById(R.id.commentBtn);
             shareBtn = itemView.findViewById(R.id.shareBtn);
+            profileLayout = itemView.findViewById(R.id.profileLayout);
         }
     }
 }

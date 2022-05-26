@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,6 +42,7 @@ public class HomeFragment extends Fragment {
     RecyclerView mRecyclerView;
     List<Post> mPostList;
     PostAdapter mPostAdapter;
+    FloatingActionButton mAddPostButton;
 
     public HomeFragment() {
     }
@@ -50,6 +52,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home_, container, false);
+        mAddPostButton= view.findViewById(R.id.add_post);
         // init
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -63,7 +66,12 @@ public class HomeFragment extends Fragment {
 // init post list
         mPostList = new ArrayList<>();
         loadPosts();
-
+        mAddPostButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), AddPostActivity.class));
+            }
+        });
         return view;
     }
 
@@ -134,7 +142,7 @@ public class HomeFragment extends Fragment {
 
         MenuItem item = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
-// search listener
+        // search listener
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -157,15 +165,6 @@ public class HomeFragment extends Fragment {
             }
         });
         super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_post) {
-            startActivity(new Intent(getActivity(), AddPostActivity.class));
-        }
-        return super.onOptionsItemSelected(item);
     }
 
 
