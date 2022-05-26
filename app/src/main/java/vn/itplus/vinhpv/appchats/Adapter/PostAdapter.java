@@ -43,6 +43,7 @@ import java.util.Locale;
 
 import vn.itplus.vinhpv.appchats.Model.Post;
 import vn.itplus.vinhpv.appchats.R;
+import vn.itplus.vinhpv.appchats.activity.AddPostActivity;
 import vn.itplus.vinhpv.appchats.activity.ThereProfileActivity;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
@@ -163,6 +164,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         PopupMenu popupMenu = new PopupMenu(context, moreBtn, Gravity.END);
         if (uid.equals(myUid)) {
             popupMenu.getMenu().add(Menu.NONE, 0, 0, "Delete");
+            popupMenu.getMenu().add(Menu.NONE, 1, 0, "Edit");
         }
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
@@ -171,6 +173,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                 if (id == 0) {
                     //delete post click
                     deletePost(pId,pImage);
+                }else if (id == 1) {
+                    //edit post click
+                    Intent intent = new Intent(context, AddPostActivity.class);
+                    intent.putExtra("key","editPost");
+                    intent.putExtra("editPostId",pId);
+                    context.startActivity(intent);
                 }
                 return false;
             }
