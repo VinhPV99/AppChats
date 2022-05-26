@@ -2,6 +2,7 @@ package vn.itplus.vinhpv.appchats.Adapter;
 
 import static android.view.View.GONE;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +31,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
@@ -52,11 +54,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     List<Post> postList;
     String myUid;
     ProgressDialog mProgressDialog;
+    private DatabaseReference likesRef;
+    private DatabaseReference postsRef;
+
+    boolean mProcessLike = false;
 
     public PostAdapter(Context context, List<Post> postList) {
         this.context = context;
         this.postList = postList;
         myUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        likesRef = FirebaseDatabase.getInstance().getReference().child("Likes");
+        postsRef = FirebaseDatabase.getInstance().getReference().child("Posts");
     }
 
     @androidx.annotation.NonNull
@@ -68,7 +76,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@androidx.annotation.NonNull MyHolder holder, int position) {
+    public void onBindViewHolder(@androidx.annotation.NonNull MyHolder holder, @SuppressLint("RecyclerView") int position) {
         // get data
         String uid = postList.get(position).getUid();
         String uEmail = postList.get(position).getuEmail();
@@ -78,6 +86,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         String pTitle = postList.get(position).getpTitle();
         String pDescription = postList.get(position).getpDescr();
         String pImage = postList.get(position).getpImage();
+        String pLikes = postList.get(position).getpLikes();
         String pTimeStamp = postList.get(position).getpTime();
         // convert timestamp to dd/mm/yyyy hh:mm am/pm
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
@@ -87,17 +96,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         // set data
         holder.uNameTv.setText(uName);
         holder.pTimeTv.setText(pTime);
-        if(pTitle == null){
+        if (pTitle == null) {
             holder.pTitleTv.setVisibility(GONE);
-        }else {
+        } else {
             holder.pTitleTv.setText(pTitle);
         }
-        if(pDescription == null){
+        if (pDescription == null) {
             holder.pDescriptionTv.setVisibility(GONE);
-        }else {
+        } else {
             holder.pDescriptionTv.setText(pDescription);
         }
-
+        holder.pLikesTv.setText(" "+pLikes + " Like");
+        setLikes(holder,pId);
         // set user dp
         try {
             Picasso.get().load(uDp).placeholder(R.mipmap.avatar).into(holder.uPictureIv);
@@ -127,8 +137,32 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         holder.likeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // will implement later
-                Toast.makeText(context, "Like", Toast.LENGTH_SHORT).show();
+                final int pLikes = Integer.parseInt(postList.get(position).getpLikes());
+                mProcessLike = true;
+                // get id of the post clicked
+                final String postIde = postList.get(position).getpId();
+                likesRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (mProcessLike) {
+                            if (dataSnapshot.child(postIde).hasChild(myUid)) {
+                                // already liked,so remove like
+                                postsRef.child(postIde).child("pLikes").setValue("" + (pLikes - 1));
+                                likesRef.child(postIde).child(myUid).removeValue();
+                                mProcessLike = false;
+                            }else {
+                                // not liked,like it
+                                postsRef.child(postIde).child("pLikes").setValue(""+(pLikes+1));
+                                likesRef.child(postIde).child(myUid).setValue("Liked");// set any value
+                                mProcessLike=false;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
             }
         });
 
@@ -158,6 +192,29 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         });
     }
 
+    private void setLikes(MyHolder holder,final String pId) {
+        likesRef.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("ResourceAsColor")
+            @Override
+            public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
+                if(snapshot.child(pId).hasChild(myUid)){
+                    holder.likeBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_liked,0,0,0);
+                    holder.likeBtn.setText("Like");
+                    holder.likeBtn.setTextColor(R.color.color_liked);
+                }else{
+                    holder.likeBtn.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_like,0,0,0);
+                    holder.likeBtn.setText("Like");
+                    holder.likeBtn.setTextColor(R.color.color_text_post);
+                }
+            }
+
+            @Override
+            public void onCancelled(@androidx.annotation.NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void showMoreOptions(ImageButton moreBtn, String uid, String myUid, String pId, String pImage) {
 
@@ -172,12 +229,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                 int id = item.getItemId();
                 if (id == 0) {
                     //delete post click
-                    deletePost(pId,pImage);
-                }else if (id == 1) {
+                    deletePost(pId, pImage);
+                } else if (id == 1) {
                     //edit post click
                     Intent intent = new Intent(context, AddPostActivity.class);
-                    intent.putExtra("key","editPost");
-                    intent.putExtra("editPostId",pId);
+                    intent.putExtra("key", "editPost");
+                    intent.putExtra("editPostId", pId);
                     context.startActivity(intent);
                 }
                 return false;
@@ -187,10 +244,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     }
 
     private void deletePost(String pId, String pImage) {
-        if(pImage.equals("noImage")){
+        if (pImage.equals("noImage")) {
             deleteWithoutImage(pId);
-        }else{
-            deleteWithImage(pId,pImage);
+        } else {
+            deleteWithImage(pId, pImage);
         }
     }
 
@@ -205,7 +262,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot ds : snapshot.getChildren()){
+                        for (DataSnapshot ds : snapshot.getChildren()) {
                             ds.getRef().removeValue();
                         }
                         mProgressDialog.dismiss();
@@ -230,7 +287,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
-                for (DataSnapshot ds : snapshot.getChildren()){
+                for (DataSnapshot ds : snapshot.getChildren()) {
                     ds.getRef().removeValue();
                 }
                 mProgressDialog.dismiss();

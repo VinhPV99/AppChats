@@ -9,5 +9,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="colorPrimary">#0D84DF</color>
     <color name="color_text_post">#003B68</color>
+    <color name="color_liked">#0398EE</color>
 
 </resources>

@@ -189,6 +189,7 @@ public class AddPostActivity extends AppCompatActivity {
         hashMap.put("uName", name);
         hashMap.put("uEmail", email);
         hashMap.put("uDp", dp);
+        hashMap.put("pLikes","0");
         hashMap.put("pTitle", title);
         hashMap.put("pDescr", description);
         hashMap.put("pImage", "noImage");
@@ -237,6 +238,7 @@ public class AddPostActivity extends AppCompatActivity {
                             hashMap.put("uName", name);
                             hashMap.put("uEmail", email);
                             hashMap.put("uDp", dp);
+                            hashMap.put("pLikes","0");
                             hashMap.put("pTitle", title);
                             hashMap.put("pDescr", description);
                             hashMap.put("pImage", downloadUri);
@@ -301,6 +303,7 @@ public class AddPostActivity extends AppCompatActivity {
                                             hashMap.put("uName", name);
                                             hashMap.put("uEmail", email);
                                             hashMap.put("uDp", dp);
+                                            hashMap.put("pLikes","0");
                                             hashMap.put("pTitle", title);
                                             hashMap.put("pDescr", description);
                                             hashMap.put("pImage", downloadUri);
@@ -398,6 +401,7 @@ public class AddPostActivity extends AppCompatActivity {
                                 hashMap.put("uName", name);
                                 hashMap.put("uEmail", email);
                                 hashMap.put("uDp", dp);
+                                hashMap.put("pLikes","0");
                                 hashMap.put("pId", timestamp);
                                 hashMap.put("pTitle", title);
                                 hashMap.put("pDescr", description);
@@ -409,7 +413,6 @@ public class AddPostActivity extends AppCompatActivity {
                                 ref.child(timestamp).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
-                                        pd.dismiss();
                                         Toast.makeText(AddPostActivity.this, "Post published", Toast.LENGTH_SHORT).show();
                                         // reset views
                                         titleEt.setText("");
@@ -421,7 +424,6 @@ public class AddPostActivity extends AppCompatActivity {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         // failed uploading image
-                                        pd.dismiss();
                                         Toast.makeText(AddPostActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 });
@@ -444,6 +446,7 @@ public class AddPostActivity extends AppCompatActivity {
             hashMap.put("uName", name);
             hashMap.put("uEmail", email);
             hashMap.put("uDp", dp);
+            hashMap.put("pLikes","0");
             hashMap.put("pId", timestamp);
             hashMap.put("pTitle", title);
             hashMap.put("pDescr", description);
