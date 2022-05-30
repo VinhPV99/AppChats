@@ -46,6 +46,7 @@ import java.util.Locale;
 import vn.itplus.vinhpv.appchats.Model.Post;
 import vn.itplus.vinhpv.appchats.R;
 import vn.itplus.vinhpv.appchats.activity.AddPostActivity;
+import vn.itplus.vinhpv.appchats.activity.CommentDetailActivity;
 import vn.itplus.vinhpv.appchats.activity.ThereProfileActivity;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
@@ -87,6 +88,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         String pDescription = postList.get(position).getpDescr();
         String pImage = postList.get(position).getpImage();
         String pLikes = postList.get(position).getpLikes();
+        String pComments = postList.get(position).getpComments();
         String pTimeStamp = postList.get(position).getpTime();
         // convert timestamp to dd/mm/yyyy hh:mm am/pm
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
@@ -107,6 +109,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             holder.pDescriptionTv.setText(pDescription);
         }
         holder.pLikesTv.setText(" "+pLikes + " Like");
+        holder.pCommentsTv.setText(" "+pComments + " Comment");
         setLikes(holder,pId);
         // set user dp
         try {
@@ -169,8 +172,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         holder.commentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // will implement later
-                Toast.makeText(context, "Comment", Toast.LENGTH_SHORT).show();
+             Intent intent = new Intent(context, CommentDetailActivity.class);
+             intent.putExtra("postId",pId);
+             context.startActivity(intent);
             }
         });
 
@@ -223,6 +227,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             popupMenu.getMenu().add(Menu.NONE, 0, 0, "Delete");
             popupMenu.getMenu().add(Menu.NONE, 1, 0, "Edit");
         }
+        popupMenu.getMenu().add(Menu.NONE, 2, 0, "View Detail");
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -236,7 +241,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                     intent.putExtra("key", "editPost");
                     intent.putExtra("editPostId", pId);
                     context.startActivity(intent);
+                } else if (id == 2) {
+                    Intent intent = new Intent(context, CommentDetailActivity.class);
+                    intent.putExtra("postId",pId);
+                    context.startActivity(intent);
                 }
+
                 return false;
             }
         });
@@ -309,7 +319,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     class MyHolder extends RecyclerView.ViewHolder {
         // views from row_post.xml
         ImageView uPictureIv, pImageIv;
-        TextView uNameTv, pTimeTv, pTitleTv, pDescriptionTv, pLikesTv;
+        TextView uNameTv, pTimeTv, pTitleTv, pDescriptionTv, pLikesTv,pCommentsTv;
         ImageButton moreBtn;
         Button likeBtn, commentBtn, shareBtn;
         LinearLayout profileLayout;
@@ -324,6 +334,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             pTitleTv = itemView.findViewById(R.id.pTitleTv);
             pDescriptionTv = itemView.findViewById(R.id.pDescriptionTv);
             pLikesTv = itemView.findViewById(R.id.pLikesTv);
+            pCommentsTv = itemView.findViewById(R.id.pCommentsTv);
             moreBtn = itemView.findViewById(R.id.moreBtn);
             likeBtn = itemView.findViewById(R.id.likeBtn);
             commentBtn = itemView.findViewById(R.id.commentBtn);

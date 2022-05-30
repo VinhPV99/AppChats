@@ -2,7 +2,24 @@ package vn.itplus.vinhpv.appchats.Model;
 
 public class Post {
     // use same name as we given while uploading post
-    String pId,pTitle,pDescr, pLikes, pImage,pTime,uid,uEmail,uDp,uName;
+    String pId,pTitle,pDescr, pLikes,pComments, pImage,pTime,uid,uEmail,uDp,uName;
+
+    public Post() {
+    }
+
+    public Post(String pId, String pTitle, String pDescr, String pLikes, String pComments, String pImage, String pTime, String uid, String uEmail, String uDp, String uName) {
+        this.pId = pId;
+        this.pTitle = pTitle;
+        this.pDescr = pDescr;
+        this.pLikes = pLikes;
+        this.pComments = pComments;
+        this.pImage = pImage;
+        this.pTime = pTime;
+        this.uid = uid;
+        this.uEmail = uEmail;
+        this.uDp = uDp;
+        this.uName = uName;
+    }
 
     public String getpId() {
         return pId;
@@ -34,6 +51,14 @@ public class Post {
 
     public void setpLikes(String pLikes) {
         this.pLikes = pLikes;
+    }
+
+    public String getpComments() {
+        return pComments;
+    }
+
+    public void setpComments(String pComments) {
+        this.pComments = pComments;
     }
 
     public String getpImage() {
@@ -82,21 +107,5 @@ public class Post {
 
     public void setuName(String uName) {
         this.uName = uName;
-    }
-
-    public Post(String pId, String pTitle, String pDescr, String pLikes, String pImage, String pTime, String uid, String uEmail, String uDp, String uName) {
-        this.pId = pId;
-        this.pTitle = pTitle;
-        this.pDescr = pDescr;
-        this.pLikes = pLikes;
-        this.pImage = pImage;
-        this.pTime = pTime;
-        this.uid = uid;
-        this.uEmail = uEmail;
-        this.uDp = uDp;
-        this.uName = uName;
-    }
-
-    public Post() {
     }
 }

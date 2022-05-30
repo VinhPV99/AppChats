@@ -190,6 +190,7 @@ public class AddPostActivity extends AppCompatActivity {
         hashMap.put("uEmail", email);
         hashMap.put("uDp", dp);
         hashMap.put("pLikes","0");
+        hashMap.put("pComments","0");
         hashMap.put("pTitle", title);
         hashMap.put("pDescr", description);
         hashMap.put("pImage", "noImage");
@@ -239,6 +240,7 @@ public class AddPostActivity extends AppCompatActivity {
                             hashMap.put("uEmail", email);
                             hashMap.put("uDp", dp);
                             hashMap.put("pLikes","0");
+                            hashMap.put("pComments","0");
                             hashMap.put("pTitle", title);
                             hashMap.put("pDescr", description);
                             hashMap.put("pImage", downloadUri);
@@ -304,6 +306,7 @@ public class AddPostActivity extends AppCompatActivity {
                                             hashMap.put("uEmail", email);
                                             hashMap.put("uDp", dp);
                                             hashMap.put("pLikes","0");
+                                            hashMap.put("pComments","0");
                                             hashMap.put("pTitle", title);
                                             hashMap.put("pDescr", description);
                                             hashMap.put("pImage", downloadUri);
@@ -402,6 +405,7 @@ public class AddPostActivity extends AppCompatActivity {
                                 hashMap.put("uEmail", email);
                                 hashMap.put("uDp", dp);
                                 hashMap.put("pLikes","0");
+                                hashMap.put("pComments","0");
                                 hashMap.put("pId", timestamp);
                                 hashMap.put("pTitle", title);
                                 hashMap.put("pDescr", description);
@@ -447,6 +451,7 @@ public class AddPostActivity extends AppCompatActivity {
             hashMap.put("uEmail", email);
             hashMap.put("uDp", dp);
             hashMap.put("pLikes","0");
+            hashMap.put("pComments","0");
             hashMap.put("pId", timestamp);
             hashMap.put("pTitle", title);
             hashMap.put("pDescr", description);
