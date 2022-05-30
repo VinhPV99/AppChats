@@ -161,7 +161,7 @@ public class CommentDetailActivity extends AppCompatActivity {
                     Comment modelComment = ds.getValue(Comment.class);
                     commentList.add(modelComment);
                     // setup adapter
-                    adapterComments = new AdapterComments(getApplicationContext(), commentList);
+                    adapterComments = new AdapterComments(getApplicationContext(), commentList,myUid,postId);
                     // set adapter
                     recyclerView.setAdapter(adapterComments);
                 }
