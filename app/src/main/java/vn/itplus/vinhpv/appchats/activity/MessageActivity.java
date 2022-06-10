@@ -66,7 +66,6 @@ public class MessageActivity extends AppCompatActivity {
     MessageAdapter messageAdapter;
     List<Chat> mChat;
     ValueEventListener seenListener;
-//    DatabaseReference mReferenceForSeen;
 
     FirebaseAuth firebaseAuth;
     FirebaseDatabase firebaseDatabase;
@@ -261,8 +260,7 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 if (notify) {
-//                    sendNotification(userid, nameUser, message);
-                    sendNotification(hisUid, user.getName(), message);
+                    sendNotification(myUid, user.getName(), message);
                 }
                 notify = false;
             }
@@ -275,15 +273,15 @@ public class MessageActivity extends AppCompatActivity {
 
     }
 
-    private void sendNotification(final String hisUid,final String name,final String message) {
+    private void sendNotification(final String myUid,final String name,final String message) {
         DatabaseReference allToken = FirebaseDatabase.getInstance().getReference("Tokens");
-        Query query = allToken.orderByKey().equalTo(hisUid);
+        Query query = allToken.orderByKey().equalTo(myUid);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     Token token = ds.getValue(Token.class);
-                    Data data = new Data(myUid,  message, name, hisUid, R.mipmap.logo1);
+                    Data data = new Data(hisUid,  message, name, hisUid, R.mipmap.logo1);
                     Sender sender = new Sender(data, token.getToken());
 
                     try {

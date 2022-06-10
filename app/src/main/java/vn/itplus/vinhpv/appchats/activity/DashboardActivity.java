@@ -1,6 +1,7 @@
 package vn.itplus.vinhpv.appchats.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -17,7 +18,6 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 
-import vn.itplus.vinhpv.appchats.Adapter.Token;
 import vn.itplus.vinhpv.appchats.Fragment.ChatListFragment;
 import vn.itplus.vinhpv.appchats.Fragment.HomeFragment;
 import vn.itplus.vinhpv.appchats.Fragment.ProfileFragment;
@@ -54,12 +54,6 @@ public class DashboardActivity extends AppCompatActivity {
         ft.commit();
 
         checkUserStatus();
-    }
-
-    public void updateToken(String token) {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Tokens");
-        Token token1 = new Token(token);
-        databaseReference.child(mUid).setValue(token1);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener selectedListener
@@ -112,11 +106,11 @@ public class DashboardActivity extends AppCompatActivity {
             finish();
         }else{
             mUid = user.getUid();
-//            SharedPreferences sharedPreferences = getSharedPreferences("SP_USER",MODE_PRIVATE);
-//            SharedPreferences.Editor editor = sharedPreferences.edit();
-//            editor.putString("Current_USERID",mUid);
-//            editor.apply();
-//            updateToken(FirebaseI);
+
+            SharedPreferences sharedPreferences = getSharedPreferences("SP_USER",MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("Current_USERID",mUid);
+            editor.apply();
         }
     }
 
