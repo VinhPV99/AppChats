@@ -26,11 +26,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyHolder> {
     Context context;
     List<User> userList;
     private boolean isChat;
+    private boolean isChatList;
 
-    public UserAdapter(Context context, List<User> userList, boolean isChat) {
+    public UserAdapter(Context context, List<User> userList, boolean isChat, boolean isChatList) {
         this.context = context;
         this.userList = userList;
         this.isChat = isChat;
+        this.isChatList = isChatList;
     }
 
     @Override
@@ -74,23 +76,30 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyHolder> {
 
         holder.itemView.setOnClickListener((v) -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setItems(new String[]{"Profile", "Chat"}, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (which == 0) {
-                        //profile click
-                        Intent intent = new Intent(context, ThereProfileActivity.class);
-                        intent.putExtra("uid", userID);
-                        context.startActivity(intent);
+            if (isChatList){
+                Intent intent = new Intent(context, MessageActivity.class);
+                intent.putExtra("uid", userID);
+                context.startActivity(intent);
+            }else{
+                builder.setItems(new String[]{"Profile", "Chat"}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            //profile click
+                            Intent intent = new Intent(context, ThereProfileActivity.class);
+                            intent.putExtra("uid", userID);
+                            context.startActivity(intent);
+                        }
+                        if (which == 1) {
+                            //chat click
+                            Intent intent = new Intent(context, MessageActivity.class);
+                            intent.putExtra("uid", userID);
+                            context.startActivity(intent);
+                        }
                     }
-                    if (which == 1) {
-                        //chat click
-                        Intent intent = new Intent(context, MessageActivity.class);
-                        intent.putExtra("uid", userID);
-                        context.startActivity(intent);
-                    }
-                }
-            });
+                });
+            }
+
             builder.create().show();
         });
 

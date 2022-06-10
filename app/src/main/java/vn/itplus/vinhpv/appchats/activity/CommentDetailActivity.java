@@ -5,9 +5,11 @@ import static android.view.View.GONE;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.view.Gravity;
@@ -22,9 +24,11 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -42,6 +46,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -142,6 +148,58 @@ public class CommentDetailActivity extends AppCompatActivity {
                 showMoreOptions();
             }
         });
+        shareBtn.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                String pTitle = pTitleTv.getText().toString().trim();
+                String pDescription = pDescriptionTv.getText().toString().trim();
+                // will implement later
+                BitmapDrawable bitmapDrawable = (BitmapDrawable) pImageIv.getDrawable();
+                if (bitmapDrawable == null){
+                    shareTextOnly(pTitle,pDescription);
+                }else{
+                    Bitmap bitmap = (Bitmap) bitmapDrawable.getBitmap();
+                    shareImageAndText(pTitle,pDescription,bitmap);
+                }
+            }
+        });
+    }
+
+    private void shareImageAndText(String pTitle, String pDescription, Bitmap bitmap) {
+        String shareBody = pTitle + "\n"+ pDescription;
+        Uri uid = saveImageToShare(bitmap);
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_SUBJECT,"Subject Here");
+        intent.putExtra(Intent.EXTRA_TEXT,shareBody);
+        intent.setType("image/png");
+        startActivity(Intent.createChooser(intent, "Share Via"));
+    }
+
+    private Uri saveImageToShare(Bitmap bitmap) {
+        File imageFolder = new File(getCacheDir(),"images");
+        Uri uri = null;
+        try{
+            imageFolder.mkdir();
+            File file = new File(imageFolder,"shared_image.png");
+            FileOutputStream stream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG,90,stream);
+            stream.flush();
+            stream.close();
+            uri = FileProvider.getUriForFile(this,"vn.itplus.vinhpv.appchats.fileprovider",file);
+        }catch(Exception e){
+
+        }
+        return uri;
+    }
+
+    private void shareTextOnly(String pTitle, String pDescription) {
+        String shareBody = pTitle +"\n"+ pDescription;
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT,"Subject Here");
+        intent.putExtra(Intent.EXTRA_TEXT,shareBody);
+        startActivity(Intent.createChooser(intent, "Share Via"));
     }
 
     private void loadComments() {

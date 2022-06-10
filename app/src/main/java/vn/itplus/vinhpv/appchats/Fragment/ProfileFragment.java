@@ -126,6 +126,19 @@ public class ProfileFragment extends Fragment {
 
         queryData();
 
+        avatarTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showImageDialog();
+            }
+        });
+
+        nameTv.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                showEditInfoDialog();
+            }
+        });
         //edit info
         mEditInfo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -329,6 +342,27 @@ public class ProfileFragment extends Fragment {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK);
         galleryIntent.setType("image/*");
         startActivityForResult(galleryIntent, IMAGE_PICK_GALLERY_CODE);
+    }
+
+    private void showEditInfoDialog() {
+        String option[] = { "Cập Nhật Tên", "Cập Nhật Số Điện Thoại"};
+        AlertDialog.Builder showEdit = new AlertDialog.Builder(getActivity());
+        showEdit.setTitle("Thông tin cập nhật");
+        showEdit.setItems(option, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                 if (which == 0) {
+                    //edit name
+                    pd.setMessage("Cập Nhật Tên");
+                    showNamePhoneUpdate("name");
+                } else if (which == 1) {
+                    //edit phone
+                    pd.setMessage("Cập Nhật Số Điện Thoại");
+                    showNamePhoneUpdate("phone");
+                }
+            }
+        });
+        showEdit.create().show();
     }
 
     private void showEditProfileDialog() {

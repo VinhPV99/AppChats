@@ -92,7 +92,7 @@ public class ChatListFragment extends Fragment {
                     }
 
                 }
-                userAdapter = new UserAdapter(getContext(), mUser, true);
+                userAdapter = new UserAdapter(getContext(), mUser, true, true);
                 recyclerView.setAdapter(userAdapter);
 
             }
@@ -125,7 +125,7 @@ public class ChatListFragment extends Fragment {
                     }
 
                 }
-                userAdapter = new UserAdapter(getContext(), mUser, true);
+                userAdapter = new UserAdapter(getContext(), mUser, true,true);
                 recyclerView.setAdapter(userAdapter);
 
             }

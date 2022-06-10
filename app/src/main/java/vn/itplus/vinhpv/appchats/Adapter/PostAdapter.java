@@ -6,8 +6,10 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,9 +23,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,6 +42,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -182,7 +187,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             @Override
             public void onClick(View v) {
                 // will implement later
-                Toast.makeText(context, "Share", Toast.LENGTH_SHORT).show();
+                BitmapDrawable bitmapDrawable = (BitmapDrawable) holder.pImageIv.getDrawable();
+                if (bitmapDrawable == null){
+                    shareTextOnly(pTitle,pDescription);
+                }else{
+                    Bitmap bitmap = (Bitmap) bitmapDrawable.getBitmap();
+                    shareImageAndText(pTitle,pDescription,bitmap);
+                }
             }
         });
 
@@ -194,6 +205,42 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                 context.startActivity(intent);
             }
         });
+    }
+
+    private void shareImageAndText(String pTitle, String pDescription, Bitmap bitmap) {
+        String shareBody = pTitle + "\n"+ pDescription;
+//        Uri uid = saveImageToShare(bitmap);
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_SUBJECT,"Subject Here");
+        intent.putExtra(Intent.EXTRA_TEXT,shareBody);
+        intent.setType("image/png");
+        context.startActivity(Intent.createChooser(intent, "Share Via"));
+    }
+
+    private Uri saveImageToShare(Bitmap bitmap) {
+        File imageFolder = new File(context.getCacheDir(),"images");
+        Uri uri = null;
+        try{
+            imageFolder.mkdir();
+            File file = new File(imageFolder,"shared_image.png");
+            FileOutputStream stream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG,90,stream);
+            stream.flush();
+            stream.close();
+            uri = FileProvider.getUriForFile(context,"vn.itplus.vinhpv.appchats.fileprovider",file);
+        }catch(Exception e){
+
+        }
+        return uri;
+    }
+
+    private void shareTextOnly(String pTitle, String pDescription) {
+        String shareBody = pTitle +"\n"+ pDescription;
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT,"Subject Here");
+        intent.putExtra(Intent.EXTRA_TEXT,shareBody);
+        context.startActivity(Intent.createChooser(intent, "Share Via"));
     }
 
     private void setLikes(MyHolder holder,final String pId) {
