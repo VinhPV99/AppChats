@@ -1,6 +1,7 @@
 package vn.itplus.vinhpv.appchats.activity;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -20,9 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -59,13 +58,12 @@ public class AddPostActivity extends AppCompatActivity {
     // permissions constants
     private static final int CAMERA_REQUEST_CODE = 100;
     private static final int STORAGE_REQUEST_CODE = 200;
-    // image pick constants
-    private static final int IMAGE_PICK_CAMERA_CODE = 300;
-    private static final int IMAGE_PICK_GALLERY_CODE = 400;
-
-    // permissions array
-    String[] cameraPermissions;
-    String[] storagePermissions;
+    private static final int IMAGE_PICK_GALLERY_CODE = 300;
+    private static final int IMAGE_PICK_CAMERA_CODE = 400;
+    // arrays of permissions to be requested
+    String cameraPermissions[];
+    String storagePermissions[];
+    Uri imageUri;
 
     // user info
     String name, email, uid, dp;
@@ -112,7 +110,7 @@ public class AddPostActivity extends AppCompatActivity {
         }
 
 
-        // init permissions arrays
+        // init arrays of permissions
         cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         storagePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
@@ -145,7 +143,7 @@ public class AddPostActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // show image pick dialog
-                showImagePickDialog();
+                showImageDialog();
             }
         });
 
@@ -482,129 +480,118 @@ public class AddPostActivity extends AppCompatActivity {
         }
     }
 
-    private void showImagePickDialog() {
+    private void showImageDialog() {
+        String option[] = {"Camera", "Thư Viện", "Hủy"};
 
-
-        // options(camera,gallery)to show in dialogI
-        String[] options = {"Camera", "Gallery"};
-        // dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Choose Image from");
-        // set options to dialog
-        builder.setItems(options, new DialogInterface.OnClickListener() {
+        android.app.AlertDialog.Builder showEdit = new AlertDialog.Builder(this);
+        showEdit.setTitle("Chọn Ảnh Từ");
+        showEdit.setItems(option, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // item click handle
                 if (which == 0) {
-                    // camera clicked
+                    // Camera clicked
                     if (!checkCameraPermission()) {
                         requestCameraPermission();
                     } else {
                         pickFromCamera();
                     }
-                }
-                if (which == 1) {
-                    // gallery clicked
+
+                } else if (which == 1) {
+                    // Gallery clicked
                     if (!checkStoragePermission()) {
                         requestStoragePermission();
                     } else {
                         pickFromGallery();
                     }
+
+                } else if (which == 2) {
+                    dialog.dismiss();
                 }
             }
         });
-        builder.create().
-
-                show();
-
-    }
-
-    private void pickFromGallery() {
-        // intent to pick image from gallery
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, IMAGE_PICK_GALLERY_CODE);
+        showEdit.create().show();
     }
 
     private void pickFromCamera() {
-        // intent to pick image from camera
-        ContentValues cv = new ContentValues();
-        cv.put(MediaStore.Images.Media.TITLE, "Temp Pick");
-        cv.put(MediaStore.Images.Media.DESCRIPTION, "Temp Descr");
-        image_rui = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
-
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, image_rui);
-        startActivityForResult(intent, IMAGE_PICK_CAMERA_CODE);
-
+        // Intent of picking image from device camera
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "Temp Pic");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "Temp Description");
+        // put image uri
+        imageUri = this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        // intent to start camera
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        startActivityForResult(cameraIntent, IMAGE_PICK_CAMERA_CODE);
     }
 
-
     private boolean checkCameraPermission() {
-        // check if camera permission is enabled or not
+        // check if storage permission is enabled or not
         // return true if enabled
         // return false if not enabled
-        boolean result = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == (PackageManager.PERMISSION_GRANTED);
-        boolean result1 = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.CAMERA) == (PackageManager.PERMISSION_GRANTED);
+        boolean result = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == (PackageManager.PERMISSION_GRANTED);
+
+        boolean result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == (PackageManager.PERMISSION_GRANTED);
         return result && result1;
     }
 
     private void requestCameraPermission() {
-        // request runtime camera permission
-        ActivityCompat.requestPermissions(this, cameraPermissions, CAMERA_REQUEST_CODE);
+        // request runtime storage permission
+        requestPermissions(cameraPermissions, CAMERA_REQUEST_CODE);
+    }
+
+    private void pickFromGallery() {
+        // pick from gallery
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK);
+        galleryIntent.setType("image/*");
+        startActivityForResult(galleryIntent, IMAGE_PICK_GALLERY_CODE);
     }
 
     private boolean checkStoragePermission() {
         // check if storage permission is enabled or not
         // return true if enabled
         // return false if not enabled
-        boolean result = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == (PackageManager.PERMISSION_GRANTED);
+        boolean result = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == (PackageManager.PERMISSION_GRANTED);
         return result;
     }
 
     private void requestStoragePermission() {
         // request runtime storage permission
-        ActivityCompat.requestPermissions(this, storagePermissions, STORAGE_REQUEST_CODE);
+        requestPermissions(storagePermissions, STORAGE_REQUEST_CODE);
     }
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
         switch (requestCode) {
             case CAMERA_REQUEST_CODE: {
+                // picking from camera,first check if camera and storage permissions allowed or not
                 if (grantResults.length > 0) {
                     boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    boolean storageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                    if (cameraAccepted && storageAccepted) {
-                        // camera permission granted
+                    boolean writeStorageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    if (cameraAccepted && writeStorageAccepted) {
+                        // permissions enabled
                         pickFromCamera();
                     } else {
-                        // camera or gallery or both permissions were denied
-                        Toast.makeText(this,
-                                "Camera&Storage both permissions are neccessary ...", Toast.LENGTH_SHORT).show();
+                        // pemissions denied
+                        Toast.makeText(this, "Please enable camera&storage permission", Toast.LENGTH_LONG).show();
                     }
-                } else {
-
                 }
             }
             break;
             case STORAGE_REQUEST_CODE: {
+                // picking from gallery,first check if  storage permissions allowed or not
                 if (grantResults.length > 0) {
-                    boolean storageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    if (storageAccepted) {
-                        // storage permission granted
-                        pickFromCamera();
+                    boolean writeStorageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if (writeStorageAccepted) {
+                        // permissions enabled
+                        pickFromGallery();
                     } else {
-                        // camera or gallery or both permissions were denied
-                        Toast.makeText(this,
-                                "Storage permissions  neccessary ...", Toast.LENGTH_SHORT).show();
+                        // pemissions denied
+                        Toast.makeText(this, "Please enable storage permission", Toast.LENGTH_LONG).show();
                     }
-                } else {
-
                 }
             }
             break;
@@ -612,8 +599,9 @@ public class AddPostActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        // this method will be called after picking image from camera or gallery
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        /*This method will be called after picking image from Camera or Gallery*/
         if (resultCode == RESULT_OK) {
             if (requestCode == IMAGE_PICK_GALLERY_CODE) {
                 // image is picked from gallery,get uri of image
@@ -627,7 +615,6 @@ public class AddPostActivity extends AppCompatActivity {
                 imageIv.setImageURI(image_rui);
             }
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void checkUserStatus() {

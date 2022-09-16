@@ -95,7 +95,6 @@ public class ProfileFragment extends Fragment {
     String profileCover;
     Uri imageUri;
 
-
     public ProfileFragment() {
     }
 
@@ -123,12 +122,13 @@ public class ProfileFragment extends Fragment {
         emailTv = view.findViewById(R.id.emailTv);
         mEditInfo = view.findViewById(R.id.edit_profile);
         mPostRecyclerView = view.findViewById(R.id.postProfile);
-
         queryData();
 
         avatarTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                pd.setMessage("Cập Nhật Ảnh Đại Diện");
+                profileCover = "image";
                 showImageDialog();
             }
         });
@@ -257,93 +257,6 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private boolean checkStoragePermission() {
-        // check if storage permission is enabled or not
-        // return true if enabled
-        // return false if not enabled
-        boolean result = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == (PackageManager.PERMISSION_GRANTED);
-        return result;
-    }
-
-    private void requestStoragePermission() {
-        // request runtime storage permission
-        requestPermissions(storagePermissions, STORAGE_REQUEST_CODE);
-    }
-
-    private boolean checkCameraPermission() {
-        // check if storage permission is enabled or not
-        // return true if enabled
-        // return false if not enabled
-        boolean result = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
-                == (PackageManager.PERMISSION_GRANTED);
-
-        boolean result1 = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == (PackageManager.PERMISSION_GRANTED);
-        return result && result1;
-    }
-
-    private void requestCameraPermission() {
-        // request runtime storage permission
-        requestPermissions(cameraPermissions, CAMERA_REQUEST_CODE);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
-        switch (requestCode) {
-            case CAMERA_REQUEST_CODE: {
-                // picking from camera,first check if camera and storage permissions allowed or not
-                if (grantResults.length > 0) {
-                    boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    boolean writeStorageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                    if (cameraAccepted && writeStorageAccepted) {
-                        // permissions enabled
-                        pickFromCamera();
-                    } else {
-                        // pemissions denied
-                        Toast.makeText(getActivity(), "Please enable camera&storage permission", Toast.LENGTH_LONG).show();
-                    }
-                }
-            }
-            break;
-            case STORAGE_REQUEST_CODE: {
-                // picking from gallery,first check if  storage permissions allowed or not
-                if (grantResults.length > 0) {
-                    boolean writeStorageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    if (writeStorageAccepted) {
-                        // permissions enabled
-                        pickFromGallery();
-                    } else {
-                        // pemissions denied
-                        Toast.makeText(getActivity(), "Please enable storage permission", Toast.LENGTH_LONG).show();
-                    }
-                }
-            }
-            break;
-        }
-    }
-
-    private void pickFromCamera() {
-        // Intent of picking image from device camera
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, "Temp Pic");
-        values.put(MediaStore.Images.Media.DESCRIPTION, "Temp Description");
-        // put image uri
-        imageUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-        // intent to start camera
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
-        startActivityForResult(cameraIntent, IMAGE_PICK_CAMERA_CODE);
-    }
-
-    private void pickFromGallery() {
-        // pick from gallery
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK);
-        galleryIntent.setType("image/*");
-        startActivityForResult(galleryIntent, IMAGE_PICK_GALLERY_CODE);
-    }
-
     private void showEditInfoDialog() {
         String option[] = { "Cập Nhật Tên", "Cập Nhật Số Điện Thoại"};
         AlertDialog.Builder showEdit = new AlertDialog.Builder(getActivity());
@@ -366,9 +279,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showEditProfileDialog() {
-
         String option[] = {"Cập Nhật Ảnh Đại Diện", "Cập Nhật Ảnh Bìa", "Cập Nhật Tên", "Cập Nhật Số Điện Thoại"};
-
         AlertDialog.Builder showEdit = new AlertDialog.Builder(getActivity());
         showEdit.setTitle("Thông tin cập nhật");
         showEdit.setItems(option, new DialogInterface.OnClickListener() {
@@ -503,6 +414,7 @@ public class ProfileFragment extends Fragment {
         updateNP.create().show();
     }
 
+
     private void showImageDialog() {
         String option[] = {"Camera", "Thư Viện", "Hủy"};
 
@@ -524,7 +436,7 @@ public class ProfileFragment extends Fragment {
                     if (!checkStoragePermission()) {
                         requestStoragePermission();
                     } else {
-                        pickFromCamera();
+                        pickFromGallery();
                     }
 
                 } else if (which == 2) {
@@ -533,6 +445,92 @@ public class ProfileFragment extends Fragment {
             }
         });
         showEdit.create().show();
+    }
+
+    private void pickFromCamera() {
+        // Intent of picking image from device camera
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "Temp Pic");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "Temp Description");
+        // put image uri
+        imageUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        // intent to start camera
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+        startActivityForResult(cameraIntent, IMAGE_PICK_CAMERA_CODE);
+    }
+
+    private boolean checkCameraPermission() {
+        // check if storage permission is enabled or not
+        // return true if enabled
+        // return false if not enabled
+        boolean result = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
+                == (PackageManager.PERMISSION_GRANTED);
+
+        boolean result1 = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == (PackageManager.PERMISSION_GRANTED);
+        return result && result1;
+    }
+
+    private void requestCameraPermission() {
+        // request runtime storage permission
+        requestPermissions(cameraPermissions, CAMERA_REQUEST_CODE);
+    }
+
+    private void pickFromGallery() {
+        // pick from gallery
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK);
+        galleryIntent.setType("image/*");
+        startActivityForResult(galleryIntent, IMAGE_PICK_GALLERY_CODE);
+    }
+
+    private boolean checkStoragePermission() {
+        // check if storage permission is enabled or not
+        // return true if enabled
+        // return false if not enabled
+        boolean result = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == (PackageManager.PERMISSION_GRANTED);
+        return result;
+    }
+
+    private void requestStoragePermission() {
+        // request runtime storage permission
+        requestPermissions(storagePermissions, STORAGE_REQUEST_CODE);
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        switch (requestCode) {
+            case CAMERA_REQUEST_CODE: {
+                // picking from camera,first check if camera and storage permissions allowed or not
+                if (grantResults.length > 0) {
+                    boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    boolean writeStorageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    if (cameraAccepted && writeStorageAccepted) {
+                        // permissions enabled
+                        pickFromCamera();
+                    } else {
+                        // pemissions denied
+                        Toast.makeText(getActivity(), "Please enable camera&storage permission", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+            break;
+            case STORAGE_REQUEST_CODE: {
+                // picking from gallery,first check if  storage permissions allowed or not
+                if (grantResults.length > 0) {
+                    boolean writeStorageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if (writeStorageAccepted) {
+                        // permissions enabled
+                        pickFromGallery();
+                    } else {
+                        // pemissions denied
+                        Toast.makeText(getActivity(), "Please enable storage permission", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+            break;
+        }
     }
 
     @Override
@@ -685,7 +683,6 @@ public class ProfileFragment extends Fragment {
                 }
                 return false;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (!TextUtils.isEmpty(newText)) {

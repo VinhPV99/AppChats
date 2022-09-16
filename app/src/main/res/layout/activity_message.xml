@@ -53,7 +53,6 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/chatLayout"
         android:layout_below="@id/toolBar"
-        android:layout_marginTop="0dp"
         android:layout_marginBottom="8dp" />
 
     <LinearLayout
@@ -63,8 +62,15 @@
         android:layout_alignParentBottom="true"
         android:background="@color/white"
         android:gravity="center"
+        android:layout_marginBottom="8dp"
         android:orientation="horizontal">
 
+        <ImageButton
+            android:id="@+id/attachBtn"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:background="@null"
+            android:src="@drawable/ic_attach_file" />
         <EditText
             android:id="@+id/text_send"
             android:layout_width="0dp"
@@ -73,7 +79,8 @@
             android:background="@drawable/background_left"
             android:hint="Message..."
             android:inputType="textCapSentences"
-            android:padding="15dp" />
+            android:padding="10dp"
+           />
 
         <ImageButton
             android:id="@+id/btn_send"
