@@ -1,5 +1,7 @@
 package vn.itplus.vinhpv.appchats.activity;
 
+import static vn.itplus.vinhpv.appchats.Utils.Constant.*;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -13,7 +15,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -73,6 +74,7 @@ import vn.itplus.vinhpv.appchats.notifications.Data;
 import vn.itplus.vinhpv.appchats.notifications.Sender;
 import vn.itplus.vinhpv.appchats.notifications.Token;
 
+/** Activity Nhắn tin*/
 public class MessageActivity extends AppCompatActivity {
     TextView username, mStatus;
     ImageView imgChat;
@@ -98,11 +100,6 @@ public class MessageActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private boolean notify = false;
 
-    // permissions constants
-    private static final int CAMERA_REQUEST_CODE = 100;
-    private static final int STORAGE_REQUEST_CODE = 200;
-    private static final int IMAGE_PICK_GALLERY_CODE = 300;
-    private static final int IMAGE_PICK_CAMERA_CODE = 400;
     // arrays of permissions to be requested
     String cameraPermissions[];
     String storagePermissions[];
@@ -134,17 +131,17 @@ public class MessageActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
 
         intent = getIntent();
-        hisUid = intent.getStringExtra("uid");
+        hisUid = intent.getStringExtra(getString(R.string.key_uid));
 
         // firebase auth instance
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
-        reference = firebaseDatabase.getReference("Users");
+        reference = firebaseDatabase.getReference(getString(R.string.path_users));
         fuser = FirebaseAuth.getInstance().getCurrentUser();
 
 
         // search user to get that user's info
-        Query query = reference.orderByChild("uid").equalTo(hisUid);
+        Query query = reference.orderByChild(getString(R.string.key_uid)).equalTo(hisUid);
 
         // search user to get that user's info
         query.addValueEventListener(new ValueEventListener() {
@@ -153,19 +150,19 @@ public class MessageActivity extends AppCompatActivity {
                 // check until required ifo is received
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     // get data
-                    nameUser = "" + ds.child("name").getValue();
-                    hisImage = "" + ds.child("image").getValue();
-                    String onLineStatus = "" + ds.child("onlineStatus").getValue();
+                    nameUser = "" + ds.child(getString(R.string.key_name)).getValue();
+                    hisImage = "" + ds.child(getString(R.string.key_image)).getValue();
+                    String onLineStatus = "" + ds.child(getString(R.string.key_online_status)).getValue();
                     // set data
                     username.setText(nameUser);
-                    if (onLineStatus.equals("online")) {
+                    if (onLineStatus.equals(getString(R.string.online))) {
                         mStatus.setText(onLineStatus);
                     } else {
                         // convert timestamp to proper time date
                         // convert time stamp to dd/mm/yyyy hh:mm am/pm
                         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
                         cal.setTimeInMillis(Long.parseLong(onLineStatus));
-                        String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa", cal).toString();
+                        String dateTime = DateFormat.format(getString(R.string.format_date), cal).toString();
                         mStatus.setText(dateTime);
                     }
                     try {
@@ -191,7 +188,7 @@ public class MessageActivity extends AppCompatActivity {
                 notify = true;
                 String msg = msg_editText.getText().toString().trim();
                 if (TextUtils.isEmpty(msg)) {
-                    Toast.makeText(MessageActivity.this, "Bạn chưa nhập nội dung...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MessageActivity.this, getString(R.string.content_null), Toast.LENGTH_SHORT).show();
                 } else {
                     sendMessage(msg);
                 }
@@ -210,10 +207,10 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
     private void showImageDialog() {
-        String option[] = {"Camera", "Thư Viện", "Hủy"};
+        String option[] = {getString(R.string.camera), getString(R.string.library),getString(R.string.cancel)};
 
         android.app.AlertDialog.Builder showEdit = new AlertDialog.Builder(this);
-        showEdit.setTitle("Chọn Ảnh Từ");
+        showEdit.setTitle(R.string.select_photo_from);
         showEdit.setItems(option, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -244,8 +241,8 @@ public class MessageActivity extends AppCompatActivity {
     private void pickFromCamera() {
         // Intent of picking image from device camera
         ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, "Temp Pic");
-        values.put(MediaStore.Images.Media.DESCRIPTION, "Temp Description");
+        values.put(MediaStore.Images.Media.TITLE, getString(R.string.temp_pic));
+        values.put(MediaStore.Images.Media.DESCRIPTION, getString(R.string.temp_descr));
         // put image uri
         imageUri = this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
         // intent to start camera
@@ -274,7 +271,7 @@ public class MessageActivity extends AppCompatActivity {
     private void pickFromGallery() {
         // pick from gallery
         Intent galleryIntent = new Intent(Intent.ACTION_PICK);
-        galleryIntent.setType("image/*");
+        galleryIntent.setType(TYPE_IMAGE);
         startActivityForResult(galleryIntent, IMAGE_PICK_GALLERY_CODE);
     }
 
@@ -294,6 +291,7 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case CAMERA_REQUEST_CODE: {
                 // picking from camera,first check if camera and storage permissions allowed or not
@@ -305,7 +303,7 @@ public class MessageActivity extends AppCompatActivity {
                         pickFromCamera();
                     } else {
                         // pemissions denied
-                        Toast.makeText(this, "Please enable camera&storage permission", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getString(R.string.pemissions_denied_camera_toast), Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -319,7 +317,7 @@ public class MessageActivity extends AppCompatActivity {
                         pickFromGallery();
                     } else {
                         // pemissions denied
-                        Toast.makeText(this, "Please enable storage permission", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, getString(R.string.pemissions_denied_storage_toast), Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -345,7 +343,7 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void SeenMessage() {
-        reference = FirebaseDatabase.getInstance().getReference("Chats");
+        reference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_chat));
         seenListener = reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -353,7 +351,7 @@ public class MessageActivity extends AppCompatActivity {
                     Chat chat = snapshot1.getValue(Chat.class);
                     if (chat.getReceiver().equals(myUid) && chat.getSender().equals(hisUid)) {
                         HashMap<String, Object> hasSeenHashMap = new HashMap<>();
-                        hasSeenHashMap.put("isseen", true);
+                        hasSeenHashMap.put(getString(R.string.key_seen), true);
                         snapshot1.getRef().updateChildren(hasSeenHashMap);
                     }
                 }
@@ -378,15 +376,14 @@ public class MessageActivity extends AppCompatActivity {
                         }
                         // Get new FCM registration token
                         String token = task.getResult();
-                        Log.d("TAG", "onComplete Token: "+ token);
-                        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("Tokens")
+                        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference(getString(R.string.path_tokens))
                                 .child(hisUid);
 
                         chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if (!snapshot.exists()) {
-                                    chatRef.child("token").setValue(token);
+                                    chatRef.child(getString(R.string.key_token)).setValue(token);
                                 }
                             }
 
@@ -403,24 +400,24 @@ public class MessageActivity extends AppCompatActivity {
         String timestamp = String.valueOf(System.currentTimeMillis());
 
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("sender", myUid);
-        hashMap.put("receiver", hisUid);
-        hashMap.put("message", message);
-        hashMap.put("timestamp", timestamp);
-        hashMap.put("type", "text");
-        hashMap.put("isseen", false);
+        hashMap.put(getString(R.string.sender), myUid);
+        hashMap.put(getString(R.string.receiver), hisUid);
+        hashMap.put(getString(R.string.message), message);
+        hashMap.put(getString(R.string.key_timestamp), timestamp);
+        hashMap.put(getString(R.string.key_type), getString(R.string.value_text));
+        hashMap.put(getString(R.string.key_seen), false);
 
-        databaseReference.child("Chats").push().setValue(hashMap);
+        databaseReference.child(getString(R.string.path_chat)).push().setValue(hashMap);
         msg_editText.setText("");
 
-        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("ChatList")
+        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference(getString(R.string.path_chat_list))
                 .child(fuser.getUid()).child(hisUid);
 
         chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    chatRef.child("id").setValue(hisUid);
+                    chatRef.child(getString(R.string.key_id_chat)).setValue(hisUid);
                 }
             }
 
@@ -431,7 +428,7 @@ public class MessageActivity extends AppCompatActivity {
         });
 
 
-        final DatabaseReference database = FirebaseDatabase.getInstance().getReference("Users").child(myUid);
+        final DatabaseReference database = FirebaseDatabase.getInstance().getReference(getString(R.string.path_users)).child(myUid);
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -453,11 +450,11 @@ public class MessageActivity extends AppCompatActivity {
     private void sendImageMessage(Uri image_rui) {
         notify = true;
         ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(" Sending image ...");
+        progressDialog.setMessage(getString(R.string.sending_image));
         progressDialog.show();
 
         String timestamp = ""+ System.currentTimeMillis();
-        String filePathAndName = "ChatImages/"+"post_"+ timestamp;
+        String filePathAndName = FILE_PATH_IMAGE+ timestamp;
 
 //        get bitmap from image uri
         try {
@@ -476,22 +473,22 @@ public class MessageActivity extends AppCompatActivity {
                     if(uriTask.isSuccessful()){
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
                         HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("sender", myUid);
-                        hashMap.put("receiver", hisUid);
-                        hashMap.put("message", downloadUri);
-                        hashMap.put("timestamp", timestamp);
-                        hashMap.put("type", "image");
-                        hashMap.put("isseen", false);
+                        hashMap.put(getString(R.string.sender), myUid);
+                        hashMap.put(getString(R.string.receiver), hisUid);
+                        hashMap.put(getString(R.string.message), downloadUri);
+                        hashMap.put(getString(R.string.key_timestamp), timestamp);
+                        hashMap.put(getString(R.string.key_type), getString(R.string.key_image));
+                        hashMap.put(getString(R.string.key_seen), false);
 
-                        databaseReference.child("Chats").push().setValue(hashMap);
+                        databaseReference.child(getString(R.string.path_chat)).push().setValue(hashMap);
 
-                        final DatabaseReference database = FirebaseDatabase.getInstance().getReference("Users").child(myUid);
+                        final DatabaseReference database = FirebaseDatabase.getInstance().getReference(getString(R.string.path_users)).child(myUid);
                         database.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 User user = snapshot.getValue(User.class);
                                 if (notify) {
-                                    sendNotification(myUid, user.getName(), " Sent you a photo...");
+                                    sendNotification(myUid, user.getName(), getString(R.string.sent_you_a_photo));
                                 }
                                 notify = false;
                             }
@@ -502,14 +499,14 @@ public class MessageActivity extends AppCompatActivity {
                             }
                         });
 
-                        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("ChatList")
+                        final DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference(getString(R.string.path_chat_list))
                                 .child(fuser.getUid()).child(hisUid);
 
                         chatRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if (!snapshot.exists()) {
-                                    chatRef.child("id").setValue(hisUid);
+                                    chatRef.child(getString(R.string.key_id_chat)).setValue(hisUid);
                                 }
                             }
 
@@ -533,7 +530,7 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void sendNotification(final String myUid,final String name,final String message) {
-        DatabaseReference allToken = FirebaseDatabase.getInstance().getReference("Tokens");
+        DatabaseReference allToken = FirebaseDatabase.getInstance().getReference(getString(R.string.path_tokens));
         Query query = allToken.orderByKey().equalTo(myUid);
         query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -545,7 +542,7 @@ public class MessageActivity extends AppCompatActivity {
 
                     try {
                         JSONObject senderJSON = new JSONObject(new Gson().toJson(sender));
-                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest("https://fcm.googleapis.com/fcm/send", senderJSON,
+                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(API_SENT_NOTIFICATION, senderJSON,
                                 new Response.Listener<JSONObject>() {
                                     @Override
                                     public void onResponse(JSONObject response) {
@@ -561,8 +558,8 @@ public class MessageActivity extends AppCompatActivity {
                             @Override
                             public Map<String, String> getHeaders() throws AuthFailureError {
                                 Map<String, String> headers = new HashMap<>();
-                                headers.put("Content-Type","application/json");
-                                headers.put("Authorization","key=AAAAPNE6rOY:APA91bE-MGuKxvfCmRhiMda3NBUiHQ9wZJbeV36UcGQKiiuPufWtdoWZuu1uU2_kfZHoSYsW9_HSpIwV-0XLhzw4gq-lmsbbRwg3P3NBMTz8kU7u1dp84ajnq1OTrYB-6iW85TCcKsjw");
+                                headers.put(CONTENT_TYPE,CONTENT_TYPE_VALUE);
+                                headers.put(AUTHORIZATION,AUTHORIZATION_VALUE);
 
                                 return headers;
                             }
@@ -596,7 +593,7 @@ public class MessageActivity extends AppCompatActivity {
 
     private void readMessage() {
         mChat = new ArrayList<>();
-        reference = FirebaseDatabase.getInstance().getReference("Chats");
+        reference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_chat));
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -622,32 +619,32 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void CheckStatus(String status) {
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(myUid);
+        reference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_users)).child(myUid);
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("onlineStatus", status);
+        hashMap.put(getString(R.string.key_online_status), status);
         reference.updateChildren(hashMap);
     }
 
     private void setStatus(String status) {
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(myUid);
+        reference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_users)).child(myUid);
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("status", status);
+        hashMap.put(getString(R.string.status), status);
         reference.updateChildren(hashMap);
     }
 
     @Override
     protected void onStart() {
         checkUserStatus();
-        CheckStatus("online");
-        setStatus("online");
+        CheckStatus(getString(R.string.online));
+        setStatus(getString(R.string.online));
         super.onStart();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        CheckStatus("online");
-        setStatus("online");
+        CheckStatus(getString(R.string.online));
+        setStatus(getString(R.string.online));
     }
 
     @Override
@@ -657,7 +654,7 @@ public class MessageActivity extends AppCompatActivity {
         // get timestamp
         String timestamp = String.valueOf(System.currentTimeMillis());
         CheckStatus(timestamp);
-        setStatus("offline");
+        setStatus(getString(R.string.offline));
     }
 
 }

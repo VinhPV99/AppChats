@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import vn.itplus.vinhpv.appchats.R;
 
+/** Activity mở app lần đầu, và sau khi đăng xuất*/
 public class MainActivity extends AppCompatActivity {
     Button BtnRegister, BtnLogin;
 

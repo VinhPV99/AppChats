@@ -3,6 +3,8 @@ package vn.itplus.vinhpv.appchats.Fragment;
 import static android.app.Activity.RESULT_OK;
 import static com.google.firebase.storage.FirebaseStorage.getInstance;
 
+import static vn.itplus.vinhpv.appchats.Utils.Constant.*;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -64,11 +66,6 @@ import vn.itplus.vinhpv.appchats.activity.MainActivity;
 
 public class ProfileFragment extends Fragment {
 
-    // permissions constants
-    private static final int CAMERA_REQUEST_CODE = 100;
-    private static final int STORAGE_REQUEST_CODE = 200;
-    private static final int IMAGE_PICK_GALLERY_CODE = 300;
-    private static final int IMAGE_PICK_CAMERA_CODE = 400;
     // arrays of permissions to be requested
     String cameraPermissions[];
     String storagePermissions[];
@@ -84,7 +81,7 @@ public class ProfileFragment extends Fragment {
 
     StorageReference storageReference;
     // path where images of user profile and cover will be stored
-    String storagePath = "Users_Profile_Cover_Imgs/";
+
 
     FloatingActionButton mAddPostButton;
     ProgressDialog pd;
@@ -106,7 +103,7 @@ public class ProfileFragment extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("Users");
+        databaseReference = firebaseDatabase.getReference(getString(R.string.path_users));
         storageReference = getInstance().getReference();// firebase storage reference
 
         // init arrays of permissions
@@ -127,8 +124,8 @@ public class ProfileFragment extends Fragment {
         avatarTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pd.setMessage("Cập Nhật Ảnh Đại Diện");
-                profileCover = "image";
+                pd.setMessage(getString(R.string.update_avatar));
+                profileCover = getString(R.string.key_image);
                 showImageDialog();
             }
         });
@@ -164,18 +161,18 @@ public class ProfileFragment extends Fragment {
     }
 
     private void queryData() {
-        Query query = databaseReference.orderByChild("email").equalTo(user.getEmail());
+        Query query = databaseReference.orderByChild(getString(R.string.key_email)).equalTo(user.getEmail());
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     //get data
-                    String name = "" + ds.child("name").getValue();
-                    String email = "" + ds.child("email").getValue();
-                    String phone = "" + ds.child("phone").getValue();
-                    String image = "" + ds.child("image").getValue();
-                    String cover = "" + ds.child("cover").getValue();
+                    String name = "" + ds.child(getString(R.string.key_name)).getValue();
+                    String email = "" + ds.child(getString(R.string.key_email)).getValue();
+                    String phone = "" + ds.child(getString(R.string.phone)).getValue();
+                    String image = "" + ds.child(getString(R.string.key_image)).getValue();
+                    String cover = "" + ds.child(getString(R.string.cover)).getValue();
 
                     //setData
                     nameTv.setText(name);
@@ -207,8 +204,8 @@ public class ProfileFragment extends Fragment {
         layoutManager.setStackFromEnd(true);
         layoutManager.setReverseLayout(true);
         mPostRecyclerView.setLayoutManager(layoutManager);
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
-        Query query = databaseReference.orderByChild("uid").equalTo(mUid);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts));
+        Query query = databaseReference.orderByChild(getString(R.string.key_uid)).equalTo(mUid);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -233,8 +230,8 @@ public class ProfileFragment extends Fragment {
         layoutManager.setStackFromEnd(true);
         layoutManager.setReverseLayout(true);
         mPostRecyclerView.setLayoutManager(layoutManager);
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
-        Query query = databaseReference.orderByChild("uid").equalTo(mUid);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts));
+        Query query = databaseReference.orderByChild(getString(R.string.key_uid)).equalTo(mUid);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -258,20 +255,20 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showEditInfoDialog() {
-        String option[] = { "Cập Nhật Tên", "Cập Nhật Số Điện Thoại"};
+        String option[] = { getString(R.string.update_name), getString(R.string.update_phone)};
         AlertDialog.Builder showEdit = new AlertDialog.Builder(getActivity());
-        showEdit.setTitle("Thông tin cập nhật");
+        showEdit.setTitle(getString(R.string.update_info));
         showEdit.setItems(option, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                  if (which == 0) {
                     //edit name
-                    pd.setMessage("Cập Nhật Tên");
-                    showNamePhoneUpdate("name");
+                    pd.setMessage(getString(R.string.update_name));
+                    showNamePhoneUpdate(getString(R.string.key_name));
                 } else if (which == 1) {
                     //edit phone
-                    pd.setMessage("Cập Nhật Số Điện Thoại");
-                    showNamePhoneUpdate("phone");
+                    pd.setMessage(getString(R.string.update_phone));
+                    showNamePhoneUpdate(getString(R.string.phone));
                 }
             }
         });
@@ -279,31 +276,31 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showEditProfileDialog() {
-        String option[] = {"Cập Nhật Ảnh Đại Diện", "Cập Nhật Ảnh Bìa", "Cập Nhật Tên", "Cập Nhật Số Điện Thoại"};
+        String option[] = {getString(R.string.update_avatar), getString(R.string.cover_photo_update), getString(R.string.update_name),getString(R.string.update_phone)};
         AlertDialog.Builder showEdit = new AlertDialog.Builder(getActivity());
-        showEdit.setTitle("Thông tin cập nhật");
+        showEdit.setTitle(getString(R.string.update_info));
         showEdit.setItems(option, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
                     //edit img
-                    pd.setMessage("Cập Nhật Ảnh Đại Diện");
-                    profileCover = "image";
+                    pd.setMessage(getString(R.string.update_avatar));
+                    profileCover = getString(R.string.key_image);
                     showImageDialog();
 
                 } else if (which == 1) {
                     //edit cover
-                    pd.setMessage("Cập Nhật Ảnh Bìa");
-                    profileCover = "cover";
+                    pd.setMessage(getString(R.string.cover_photo_update));
+                    profileCover = getString(R.string.cover);
                     showImageDialog();
                 } else if (which == 2) {
                     //edit name
-                    pd.setMessage("Cập Nhật Tên");
-                    showNamePhoneUpdate("name");
+                    pd.setMessage(getString(R.string.update_name));
+                    showNamePhoneUpdate(getString(R.string.key_name));
                 } else if (which == 3) {
                     //edit phone
-                    pd.setMessage("Cập Nhật Số Điện Thoại");
-                    showNamePhoneUpdate("phone");
+                    pd.setMessage(getString(R.string.update_phone));
+                    showNamePhoneUpdate(getString(R.string.phone));
                 }
             }
         });
@@ -313,17 +310,17 @@ public class ProfileFragment extends Fragment {
     private void showNamePhoneUpdate(String key) {
 
         AlertDialog.Builder updateNP = new AlertDialog.Builder(getActivity());
-        updateNP.setTitle("Cập nhật" + key);
+        updateNP.setTitle(getString(R.string.update) + key);
 
         LinearLayout linearLayout = new LinearLayout(getActivity());
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setPadding(10, 10, 10, 10);
         EditText editText = new EditText(getActivity());
-        editText.setHint("Nhập " + key);
+        editText.setHint(getString(R.string.input) + key);
         linearLayout.addView(editText);
 
         updateNP.setView(linearLayout);
-        updateNP.setPositiveButton("Cập nhật", new DialogInterface.OnClickListener() {
+        updateNP.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -338,7 +335,7 @@ public class ProfileFragment extends Fragment {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     pd.dismiss();
-                                    Toast.makeText(getActivity(), "Cập nhật thành công !!!", Toast
+                                    Toast.makeText(getActivity(),getString(R.string.update_successful) , Toast
                                             .LENGTH_SHORT).show();
                                 }
                             })
@@ -349,15 +346,15 @@ public class ProfileFragment extends Fragment {
                                 }
                             });
 
-                    if (key.equals("name")) {
-                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
-                        Query query = databaseReference.orderByChild("uid").equalTo(mUid);
+                    if (key.equals(getString(R.string.key_name))) {
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts));
+                        Query query = databaseReference.orderByChild(getString(R.string.key_uid)).equalTo(mUid);
                         query.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 for (DataSnapshot ds : snapshot.getChildren()) {
                                     String child = ds.getKey();
-                                    snapshot.getRef().child(child).child("uName").setValue(value);
+                                    snapshot.getRef().child(child).child(getString(R.string.key_uname)).setValue(value);
                                 }
                             }
 
@@ -373,15 +370,15 @@ public class ProfileFragment extends Fragment {
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                                     String child = ds.getKey();
-                                    if (dataSnapshot.child(child).hasChild("Comments")) {
+                                    if (dataSnapshot.child(child).hasChild(getString(R.string.path_comments))) {
                                         String child1 = "" + dataSnapshot.child(child).getKey();
-                                        Query child2 = FirebaseDatabase.getInstance().getReference("Posts").child(child1).child("Comments").orderByChild("uid").equalTo(mUid);
+                                        Query child2 = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts)).child(child1).child(getString(R.string.path_comments)).orderByChild(getString(R.string.key_uid)).equalTo(mUid);
                                         child2.addValueEventListener(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                 for(DataSnapshot ds:dataSnapshot.getChildren()){
                                                     String child=ds.getKey();
-                                                    dataSnapshot.getRef().child(child).child("uName").setValue(value);
+                                                    dataSnapshot.getRef().child(child).child(getString(R.string.key_uname)).setValue(value);
                                                 }
                                             }
 
@@ -401,11 +398,11 @@ public class ProfileFragment extends Fragment {
 
                     }
                 } else {
-                    Toast.makeText(getActivity(), "Chọn" + key, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getString(R.string.select) + key, Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        updateNP.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+        updateNP.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -416,10 +413,10 @@ public class ProfileFragment extends Fragment {
 
 
     private void showImageDialog() {
-        String option[] = {"Camera", "Thư Viện", "Hủy"};
+        String option[] = {getString(R.string.camera), getString(R.string.library), getString(R.string.cancel)};
 
         AlertDialog.Builder showEdit = new AlertDialog.Builder(getActivity());
-        showEdit.setTitle("Chọn Ảnh Từ");
+        showEdit.setTitle(R.string.select_photo_from);
         showEdit.setItems(option, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -450,8 +447,8 @@ public class ProfileFragment extends Fragment {
     private void pickFromCamera() {
         // Intent of picking image from device camera
         ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.TITLE, "Temp Pic");
-        values.put(MediaStore.Images.Media.DESCRIPTION, "Temp Description");
+        values.put(MediaStore.Images.Media.TITLE, getString(R.string.temp_pic));
+        values.put(MediaStore.Images.Media.DESCRIPTION, getString(R.string.temp_descr));
         // put image uri
         imageUri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
         // intent to start camera
@@ -480,7 +477,7 @@ public class ProfileFragment extends Fragment {
     private void pickFromGallery() {
         // pick from gallery
         Intent galleryIntent = new Intent(Intent.ACTION_PICK);
-        galleryIntent.setType("image/*");
+        galleryIntent.setType(TYPE_IMAGE);
         startActivityForResult(galleryIntent, IMAGE_PICK_GALLERY_CODE);
     }
 
@@ -511,7 +508,7 @@ public class ProfileFragment extends Fragment {
                         pickFromCamera();
                     } else {
                         // pemissions denied
-                        Toast.makeText(getActivity(), "Please enable camera&storage permission", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), getString(R.string.pemissions_denied_camera_toast), Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -525,7 +522,7 @@ public class ProfileFragment extends Fragment {
                         pickFromGallery();
                     } else {
                         // pemissions denied
-                        Toast.makeText(getActivity(), "Please enable storage permission", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), getString(R.string.pemissions_denied_storage_toast), Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -551,7 +548,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void uploadProfileCoverPhoto(Uri imageUri) {
-        String filePathAndName = storagePath + "" + profileCover + "_" + user.getUid();
+        String filePathAndName = FILE_PATH_USER + "" + profileCover + "_" + user.getUid();
         StorageReference storageReference2nd = storageReference.child(filePathAndName);
         storageReference2nd.putFile(imageUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -587,15 +584,15 @@ public class ProfileFragment extends Fragment {
                                             pd.dismiss();
                                         }
                                     });
-                            if (profileCover.equals("image")) {
-                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
-                                Query query = databaseReference.orderByChild("uid").equalTo(mUid);
+                            if (profileCover.equals(getString(R.string.key_image))) {
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts));
+                                Query query = databaseReference.orderByChild(getString(R.string.key_uid)).equalTo(mUid);
                                 query.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         for (DataSnapshot ds : snapshot.getChildren()) {
                                             String child = ds.getKey();
-                                            snapshot.getRef().child(child).child("uDp").setValue(downloadUri.toString());
+                                            snapshot.getRef().child(child).child(getString(R.string.key_udp)).setValue(downloadUri.toString());
                                         }
                                     }
 
@@ -611,15 +608,15 @@ public class ProfileFragment extends Fragment {
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
                                             String child = ds.getKey();
-                                            if (dataSnapshot.child(child).hasChild("Comments")) {
+                                            if (dataSnapshot.child(child).hasChild(getString(R.string.path_comments))) {
                                                 String child1 = "" + dataSnapshot.child(child).getKey();
-                                                Query child2 = FirebaseDatabase.getInstance().getReference("Posts").child(child1).child("Comments").orderByChild("uid").equalTo(mUid);
+                                                Query child2 = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts)).child(child1).child(getString(R.string.path_comments)).orderByChild(getString(R.string.key_uid)).equalTo(mUid);
                                                 child2.addValueEventListener(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                         for(DataSnapshot ds:dataSnapshot.getChildren()){
                                                             String child=ds.getKey();
-                                                            dataSnapshot.getRef().child(child).child("uDp").setValue(downloadUri.toString());
+                                                            dataSnapshot.getRef().child(child).child(getString(R.string.key_udp)).setValue(downloadUri.toString());
                                                         }
                                                     }
 

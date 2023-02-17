@@ -33,6 +33,7 @@ import vn.itplus.vinhpv.appchats.Adapter.PostAdapter;
 import vn.itplus.vinhpv.appchats.Model.Post;
 import vn.itplus.vinhpv.appchats.R;
 
+/** Lớp profile của người khác*/
 public class ThereProfileActivity extends AppCompatActivity {
 
     FirebaseAuth firebaseAuth;
@@ -51,7 +52,7 @@ public class ThereProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_there_profile);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Profile");
+        actionBar.setTitle(R.string.profile);
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -65,7 +66,7 @@ public class ThereProfileActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
         Intent intent = getIntent();
-        mUid = intent.getStringExtra("uid");
+        mUid = intent.getStringExtra(getString(R.string.key_uid));
 
         queryData();
 
@@ -76,18 +77,18 @@ public class ThereProfileActivity extends AppCompatActivity {
     }
 
     private void queryData() {
-        Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("uid").equalTo(mUid);
+        Query query = FirebaseDatabase.getInstance().getReference(getString(R.string.path_users)).orderByChild(getString(R.string.key_uid)).equalTo(mUid);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     //get data
-                    String name = "" + ds.child("name").getValue();
-                    String email = "" + ds.child("email").getValue();
-                    String phone = "" + ds.child("phone").getValue();
-                    String image = "" + ds.child("image").getValue();
-                    String cover = "" + ds.child("cover").getValue();
+                    String name = "" + ds.child(getString(R.string.key_name)).getValue();
+                    String email = "" + ds.child(getString(R.string.key_email)).getValue();
+                    String phone = "" + ds.child(getString(R.string.phone)).getValue();
+                    String image = "" + ds.child(getString(R.string.key_image)).getValue();
+                    String cover = "" + ds.child(getString(R.string.cover)).getValue();
 
                     //setData
                     nameTv.setText(name);
@@ -119,8 +120,8 @@ public class ThereProfileActivity extends AppCompatActivity {
         layoutManager.setStackFromEnd(true);
         layoutManager.setReverseLayout(true);
         mPostRecyclerView.setLayoutManager(layoutManager);
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
-        Query query = databaseReference.orderByChild("uid").equalTo(mUid);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts));
+        Query query = databaseReference.orderByChild(getString(R.string.key_uid)).equalTo(mUid);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -144,8 +145,8 @@ public class ThereProfileActivity extends AppCompatActivity {
         layoutManager.setStackFromEnd(true);
         layoutManager.setReverseLayout(true);
         mPostRecyclerView.setLayoutManager(layoutManager);
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Posts");
-        Query query = databaseReference.orderByChild("uid").equalTo(mUid);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts));
+        Query query = databaseReference.orderByChild(getString(R.string.key_uid)).equalTo(mUid);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

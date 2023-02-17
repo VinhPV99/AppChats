@@ -77,7 +77,7 @@ public class HomeFragment extends Fragment {
 
     private void loadPosts() {
         // path of all posts
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts));
         // get all data from this ref
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -102,7 +102,7 @@ public class HomeFragment extends Fragment {
 
     private void seachPost(String search) {
         // path of all posts
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts));
         // get all data from this ref
         ref.addValueEventListener(new ValueEventListener() {
             @Override

@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import vn.itplus.vinhpv.appchats.R;
 
+/**Vinh PV: Activity login*/
 public class LoginActivity extends AppCompatActivity {
     EditText EmailET, PasswordET;
     Button LoginBtn, RegisterBtn;
@@ -43,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Actionbar and its title
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Login");
+        actionBar.setTitle(R.string.login);
         // enable back button
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
@@ -70,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
                 String email = EmailET.getText().toString().trim();
                 String pass = PasswordET.getText().toString().trim();
                 if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    EmailET.setError("Email không hợp lệ !!!");
+                    EmailET.setError(getString(R.string.invalid_email));
                     EmailET.setFocusable(true);
                 } else {
                     loginUser(email, pass);
@@ -89,12 +90,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showRecoverPasswordDialog() {
         AlertDialog.Builder showRecoverPass = new AlertDialog.Builder(this);
-        showRecoverPass.setTitle("Đặt lại mật khẩu");
+        showRecoverPass.setTitle(R.string.reset_password);
 
         LinearLayout linearLayout = new LinearLayout(this);
 
         final EditText emailEt = new EditText(this);
-        emailEt.setHint("Email");
+        emailEt.setHint( R.string.hint_email);
         emailEt.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         emailEt.setMinEms(16);
 
@@ -102,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
         linearLayout.setPadding(10, 10, 10, 10);
         showRecoverPass.setView(linearLayout);
 
-        showRecoverPass.setPositiveButton("Gửi", new DialogInterface.OnClickListener() {
+        showRecoverPass.setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String email = emailEt.getText().toString().trim();
@@ -110,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        showRecoverPass.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
+        showRecoverPass.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 finish();
@@ -120,7 +121,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void setRecoverPass(String email) {
-        progressDialog.setMessage("Đang Gửi...");
+        progressDialog.setMessage(getString(R.string.sending));
         progressDialog.show();
         mAuth.sendPasswordResetEmail(email)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -128,9 +129,9 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         progressDialog.dismiss();
                         if (task.isSuccessful()) {
-                            Toast.makeText(LoginActivity.this, "Đã Gửi tới email", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, getString(R.string.sent_to_email), Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(LoginActivity.this, "Gửi thất bại", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, getString(R.string.send_failed), Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -143,7 +144,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginUser(String email, String pass) {
-        progressDialog.setMessage("Đang đăng nhập...");
+        progressDialog.setMessage(getString(R.string.currently_logged));
         progressDialog.show();
         mAuth.signInWithEmailAndPassword(email, pass)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -152,12 +153,12 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             progressDialog.dismiss();
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Toast.makeText(LoginActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, getString(R.string.logged_in_successfully), Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(LoginActivity.this, DashboardActivity.class));
                             finish();
                         } else {
                             progressDialog.dismiss();
-                            Toast.makeText(LoginActivity.this, "Đăng nhập thất bại!!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(LoginActivity.this, getString(R.string.login_failed), Toast.LENGTH_LONG).show();
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {

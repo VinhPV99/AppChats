@@ -1,13 +1,14 @@
 package vn.itplus.vinhpv.appchats.notifications;
 
+import static vn.itplus.vinhpv.appchats.Utils.Constant.*;
+
 import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 
 public class MyApplication extends Application {
-    public static final String ID = "channel_id";
-    public static final String NAME = "FirebaseAPP";
+
     @Override
     public void onCreate() {
         super.onCreate();

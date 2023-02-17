@@ -2,6 +2,8 @@ package vn.itplus.vinhpv.appchats.Adapter;
 
 import static android.view.View.GONE;
 
+import static vn.itplus.vinhpv.appchats.Utils.Constant.*;
+
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -69,8 +71,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         this.context = context;
         this.postList = postList;
         myUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        likesRef = FirebaseDatabase.getInstance().getReference().child("Likes");
-        postsRef = FirebaseDatabase.getInstance().getReference().child("Posts");
+        likesRef = FirebaseDatabase.getInstance().getReference().child(context.getString(R.string.path_like));
+        postsRef = FirebaseDatabase.getInstance().getReference().child(context.getString(R.string.path_posts));
     }
 
     @androidx.annotation.NonNull
@@ -98,7 +100,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         // convert timestamp to dd/mm/yyyy hh:mm am/pm
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.setTimeInMillis(Long.parseLong(pTimeStamp));
-        String pTime = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
+        String pTime = DateFormat.format(context.getString(R.string.format_date), calendar).toString();
 
         // set data
         holder.uNameTv.setText(uName);
@@ -123,7 +125,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         }
         // set post image
         // if there is no image i.e. pImage.equals("no Image")then hide ImageView
-        if (pImage.equals("noImage")) {
+        if (pImage.equals(context.getString(R.string.no_image))) {
             // hide imageview
             holder.pImageIv.setVisibility(GONE);
         } else {
@@ -155,13 +157,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                         if (mProcessLike) {
                             if (dataSnapshot.child(postIde).hasChild(myUid)) {
                                 // already liked,so remove like
-                                postsRef.child(postIde).child("pLikes").setValue("" + (pLikes - 1));
+                                postsRef.child(postIde).child(context.getString(R.string.key_plikes)).setValue("" + (pLikes - 1));
                                 likesRef.child(postIde).child(myUid).removeValue();
                                 mProcessLike = false;
                             }else {
                                 // not liked,like it
-                                postsRef.child(postIde).child("pLikes").setValue(""+(pLikes+1));
-                                likesRef.child(postIde).child(myUid).setValue("Liked");// set any value
+                                postsRef.child(postIde).child(context.getString(R.string.key_plikes)).setValue(""+(pLikes+1));
+                                likesRef.child(postIde).child(myUid).setValue(R.string.liked);// set any value
                                 mProcessLike=false;
                             }
                         }
@@ -178,7 +180,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             @Override
             public void onClick(View v) {
              Intent intent = new Intent(context, CommentDetailActivity.class);
-             intent.putExtra("postId",pId);
+             intent.putExtra(context.getString(R.string.key_post_id),pId);
              context.startActivity(intent);
             }
         });
@@ -201,7 +203,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, ThereProfileActivity.class);
-                intent.putExtra("uid", uid);
+                intent.putExtra(context.getString(R.string.key_uid), uid);
                 context.startActivity(intent);
             }
         });
@@ -211,14 +213,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
         String shareBody = pTitle + "\n"+ pDescription;
 //        Uri uid = saveImageToShare(bitmap);
         Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_SUBJECT,"Subject Here");
+        intent.putExtra(Intent.EXTRA_SUBJECT,context.getString(R.string.subject_here));
         intent.putExtra(Intent.EXTRA_TEXT,shareBody);
-        intent.setType("image/png");
-        context.startActivity(Intent.createChooser(intent, "Share Via"));
+        intent.setType(TYPE_IMAGE_PNG);
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_via)));
     }
 
     private Uri saveImageToShare(Bitmap bitmap) {
-        File imageFolder = new File(context.getCacheDir(),"images");
+        File imageFolder = new File(context.getCacheDir(),context.getString(R.string.images));
         Uri uri = null;
         try{
             imageFolder.mkdir();
@@ -227,7 +229,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
             bitmap.compress(Bitmap.CompressFormat.PNG,90,stream);
             stream.flush();
             stream.close();
-            uri = FileProvider.getUriForFile(context,"vn.itplus.vinhpv.appchats.fileprovider",file);
+            uri = FileProvider.getUriForFile(context,AUTHORITY,file);
         }catch(Exception e){
 
         }
@@ -237,10 +239,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     private void shareTextOnly(String pTitle, String pDescription) {
         String shareBody = pTitle +"\n"+ pDescription;
         Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT,"Subject Here");
+        intent.setType(TYPE_TEXT_PLAIN);
+        intent.putExtra(Intent.EXTRA_SUBJECT,context.getString(R.string.subject_here));
         intent.putExtra(Intent.EXTRA_TEXT,shareBody);
-        context.startActivity(Intent.createChooser(intent, "Share Via"));
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_via)));
     }
 
     private void setLikes(MyHolder holder,final String pId) {
@@ -271,10 +273,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
 
         PopupMenu popupMenu = new PopupMenu(context, moreBtn, Gravity.END);
         if (uid.equals(myUid)) {
-            popupMenu.getMenu().add(Menu.NONE, 0, 0, "Delete");
-            popupMenu.getMenu().add(Menu.NONE, 1, 0, "Edit");
+            popupMenu.getMenu().add(Menu.NONE, 0, 0, R.string.delete);
+            popupMenu.getMenu().add(Menu.NONE, 1, 0, R.string.edit);
         }
-        popupMenu.getMenu().add(Menu.NONE, 2, 0, "View Detail");
+        popupMenu.getMenu().add(Menu.NONE, 2, 0, R.string.view_detail);
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -285,12 +287,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
                 } else if (id == 1) {
                     //edit post click
                     Intent intent = new Intent(context, AddPostActivity.class);
-                    intent.putExtra("key", "editPost");
-                    intent.putExtra("editPostId", pId);
+                    intent.putExtra(context.getString(R.string.key), context.getString(R.string.edit_post));
+                    intent.putExtra(context.getString(R.string.edit_post_id), pId);
                     context.startActivity(intent);
                 } else if (id == 2) {
                     Intent intent = new Intent(context, CommentDetailActivity.class);
-                    intent.putExtra("postId",pId);
+                    intent.putExtra(context.getString(R.string.key_post_id),pId);
                     context.startActivity(intent);
                 }
 
@@ -301,7 +303,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     }
 
     private void deletePost(String pId, String pImage) {
-        if (pImage.equals("noImage")) {
+        if (pImage.equals(context.getString(R.string.no_image))) {
             deleteWithoutImage(pId);
         } else {
             deleteWithImage(pId, pImage);
@@ -309,13 +311,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     }
 
     private void deleteWithImage(String pId, String pImage) {
-        mProgressDialog.setMessage("Deleting...");
+        mProgressDialog.setMessage(context.getString(R.string.deleting));
 
         StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(pImage);
         storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
-                Query query = FirebaseDatabase.getInstance().getReference("Posts").orderByChild("pId").equalTo(pId);
+                Query query = FirebaseDatabase.getInstance().getReference(context.getString(R.string.path_posts)).orderByChild(context.getString(R.string.key_pid)).equalTo(pId);
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
@@ -340,7 +342,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.MyHolder> {
     }
 
     private void deleteWithoutImage(String pId) {
-        Query query = FirebaseDatabase.getInstance().getReference("Posts").orderByChild("pId").equalTo(pId);
+        Query query = FirebaseDatabase.getInstance().getReference(context.getString(R.string.path_posts)).orderByChild(context.getString(R.string.key_pid)).equalTo(pId);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {

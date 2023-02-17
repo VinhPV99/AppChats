@@ -75,9 +75,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         // format time stamp
         Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
         calendar.setTimeInMillis(Long.parseLong(timestamp));
-        String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa",calendar).toString();
+        String dateTime = DateFormat.format(context.getString(R.string.format_date),calendar).toString();
 
-        if (type.equals("text")){
+        if (type.equals(context.getString(R.string.value_text))){
             holder.show_mesage.setVisibility(View.VISIBLE);
             holder.messageIv.setVisibility(View.GONE);
             holder.show_mesage.setText(chat);
@@ -99,9 +99,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         if (position==mChat.size() -1){
             if(mChat.get(position).isIsseen()){
-                holder.txt_seen.setText("Đã xem");
+                holder.txt_seen.setText(R.string.watched);
             }else{
-                holder.txt_seen.setText("Đã nhận");
+                holder.txt_seen.setText(R.string.received);
             }
         }
         else {
@@ -113,15 +113,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             @Override
             public boolean onLongClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Xóa, Gỡ bỏ");
-                builder.setMessage("Bạn có muốn xóa tin nhắn này ??");
-                builder.setPositiveButton("Xóa", new DialogInterface.OnClickListener() {
+                builder.setTitle(R.string.delete_revoke);
+                builder.setMessage(R.string.ask_to_delete);
+                builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         deleteMessage(position);
                     }
                 });
-                builder.setNegativeButton("Hủy bỏ", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -139,14 +139,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
        String myUID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         String msgTimestamp = mChat.get(position).getTimestamp();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Chats");
-        Query query = databaseReference.orderByChild("timestamp").equalTo(msgTimestamp);
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(context.getString(R.string.path_chat));
+        Query query = databaseReference.orderByChild(context.getString(R.string.key_timestamp)).equalTo(msgTimestamp);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull  DataSnapshot snapshot) {
                 for (DataSnapshot snapshot1 : snapshot.getChildren()){
 
-                    if(snapshot1.child("sender").getValue().equals(myUID)){
+                    if(snapshot1.child(context.getString(R.string.sender)).getValue().equals(myUID)){
                         //cách xoa msg1
                       snapshot1.getRef().removeValue();
 
@@ -156,7 +156,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 //                       snapshot1.getRef().updateChildren(hashMap);
 
                     }else {
-                        Toast.makeText(context,"Bạn chỉ có thể xóa tin nhắn của mình ...",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, context.getString(R.string.delete_error),Toast.LENGTH_SHORT).show();
                     }
 
                 }

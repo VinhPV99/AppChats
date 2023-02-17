@@ -2,6 +2,8 @@ package vn.itplus.vinhpv.appchats.activity;
 
 import static android.view.View.GONE;
 
+import static vn.itplus.vinhpv.appchats.Utils.Constant.*;
+
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -58,6 +60,7 @@ import vn.itplus.vinhpv.appchats.Adapter.AdapterComments;
 import vn.itplus.vinhpv.appchats.Model.Comment;
 import vn.itplus.vinhpv.appchats.R;
 
+/** Vinh PV: Activity comment*/
 public class CommentDetailActivity extends AppCompatActivity {
 
     // views
@@ -93,7 +96,7 @@ public class CommentDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_comment_detail);
         // Actionbar and its properties
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Post Detail");
+        actionBar.setTitle(R.string.post_detail);
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -118,7 +121,7 @@ public class CommentDetailActivity extends AppCompatActivity {
 
         // get id of post using intent
         Intent intent = getIntent();
-        postId = intent.getStringExtra("postId");
+        postId = intent.getStringExtra(getString(R.string.key_post_id));
 
         loadPostInfo();
         checkUserStatus();
@@ -166,18 +169,20 @@ public class CommentDetailActivity extends AppCompatActivity {
         });
     }
 
+    /* Vinh PV: Chia sẻ bài viết */
     private void shareImageAndText(String pTitle, String pDescription, Bitmap bitmap) {
         String shareBody = pTitle + "\n"+ pDescription;
         Uri uid = saveImageToShare(bitmap);
         Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_SUBJECT,"Subject Here");
+        intent.putExtra(Intent.EXTRA_SUBJECT,getString(R.string.subject_here));
         intent.putExtra(Intent.EXTRA_TEXT,shareBody);
-        intent.setType("image/png");
-        startActivity(Intent.createChooser(intent, "Share Via"));
+        intent.setDataAndType(uid,TYPE_IMAGE_PNG);
+        startActivity(Intent.createChooser(intent, getString(R.string.share_via)));
     }
 
+    /*Vinh PV: lưu lại ảnh để chia sẻ*/
     private Uri saveImageToShare(Bitmap bitmap) {
-        File imageFolder = new File(getCacheDir(),"images");
+        File imageFolder = new File(getCacheDir(),getString(R.string.images));
         Uri uri = null;
         try{
             imageFolder.mkdir();
@@ -186,31 +191,33 @@ public class CommentDetailActivity extends AppCompatActivity {
             bitmap.compress(Bitmap.CompressFormat.PNG,90,stream);
             stream.flush();
             stream.close();
-            uri = FileProvider.getUriForFile(this,"vn.itplus.vinhpv.appchats.fileprovider",file);
+            uri = FileProvider.getUriForFile(this,AUTHORITY,file);
         }catch(Exception e){
 
         }
         return uri;
     }
 
+    /*Vinh PV: Chỉ chia sẻ text*/
     private void shareTextOnly(String pTitle, String pDescription) {
         String shareBody = pTitle +"\n"+ pDescription;
         Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT,"Subject Here");
+        intent.setType(TYPE_TEXT_PLAIN);
+        intent.putExtra(Intent.EXTRA_SUBJECT,getString(R.string.subject_here));
         intent.putExtra(Intent.EXTRA_TEXT,shareBody);
-        startActivity(Intent.createChooser(intent, "Share Via"));
+        startActivity(Intent.createChooser(intent, getString(R.string.share_via)));
     }
 
+    /*Vinh PV: Load Comment*/
     private void loadComments() {
-// layout(Linear)for recyclerview
+        // layout(Linear)for recyclerview
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-// set layout to recyclerview
+        // set layout to recyclerview
         recyclerView.setLayoutManager(layoutManager);
-// init comments list
+        // init comments list
         commentList = new ArrayList<>();
-// path of the post,to get it's comments
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts").child(postId).child("Comments");
+        // path of the post,to get it's comments
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts)).child(postId).child(getString(R.string.path_comments));
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
@@ -232,13 +239,14 @@ public class CommentDetailActivity extends AppCompatActivity {
         });
     }
 
+    /*Vinh PV: Show option menu*/
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void showMoreOptions() {
 
         PopupMenu popupMenu = new PopupMenu(this, moreBtn, Gravity.END);
         if (hisUid.equals(myUid)) {
-            popupMenu.getMenu().add(Menu.NONE, 0, 0, "Delete");
-            popupMenu.getMenu().add(Menu.NONE, 1, 0, "Edit");
+            popupMenu.getMenu().add(Menu.NONE, 0, 0, R.string.delete);
+            popupMenu.getMenu().add(Menu.NONE, 1, 0, R.string.edit);
         }
 
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -251,8 +259,8 @@ public class CommentDetailActivity extends AppCompatActivity {
                 } else if (id == 1) {
                     //edit post click
                     Intent intent = new Intent(CommentDetailActivity.this, AddPostActivity.class);
-                    intent.putExtra("key", "editPost");
-                    intent.putExtra("editPostId", postId);
+                    intent.putExtra(getString(R.string.key), getString(R.string.edit_post));
+                    intent.putExtra(getString(R.string.edit_post_id), postId);
                     startActivity(intent);
                 }
 
@@ -262,16 +270,17 @@ public class CommentDetailActivity extends AppCompatActivity {
         popupMenu.show();
     }
 
+    /*Vinh PV: Xóa bài viết*/
     private void deletePost() {
-        if (pImage.equals("noImage")) {
+        if (pImage.equals(getString(R.string.no_image))) {
             deleteWithoutImage();
         } else {
             deleteWithImage();
         }
     }
-
+    /*Vinh PV: Xóa bài viết không có ảnh*/
     private void deleteWithoutImage() {
-        Query query = FirebaseDatabase.getInstance().getReference("Posts").orderByChild("pId").equalTo(postId);
+        Query query = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts)).orderByChild(getString(R.string.key_pid)).equalTo(postId);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
@@ -288,14 +297,15 @@ public class CommentDetailActivity extends AppCompatActivity {
         });
     }
 
+    /*Vinh PV: Xóa bài viết có ảnh*/
     private void deleteWithImage() {
-        progressDialog.setMessage("Deleting...");
+        progressDialog.setMessage(getString(R.string.deleting));
 
         StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(pImage);
         storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
-                Query query = FirebaseDatabase.getInstance().getReference("Posts").orderByChild("pId").equalTo(postId);
+                Query query = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts)).orderByChild(getString(R.string.key_pid)).equalTo(postId);
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
@@ -319,8 +329,9 @@ public class CommentDetailActivity extends AppCompatActivity {
         });
     }
 
+    /*Vinh PV: Xử lý hiển thị số like*/
     private void setLikes() {
-        DatabaseReference likesRef = FirebaseDatabase.getInstance().getReference().child("Likes");
+        DatabaseReference likesRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.path_like));
         likesRef.addValueEventListener(new ValueEventListener() {
             @SuppressLint("ResourceAsColor")
             @Override
@@ -343,11 +354,12 @@ public class CommentDetailActivity extends AppCompatActivity {
         });
     }
 
+    /*Vinh PV: Xử lý click like*/
     private void likePost() {
         mProcessLike = true;
         // get id of the post clicked
-        DatabaseReference likesRef = FirebaseDatabase.getInstance().getReference().child("Likes");
-        DatabaseReference postsRef = FirebaseDatabase.getInstance().getReference().child("Posts");
+        DatabaseReference likesRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.path_like));
+        DatabaseReference postsRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.path_posts));
         likesRef.addValueEventListener(new ValueEventListener() {
             @SuppressLint("ResourceAsColor")
             @Override
@@ -355,14 +367,14 @@ public class CommentDetailActivity extends AppCompatActivity {
                 if (mProcessLike) {
                     if (dataSnapshot.child(postId).hasChild(myUid)) {
                         // already liked,so remove like
-                        postsRef.child(postId).child("pLikes").setValue("" + (Integer.parseInt(pLikes) - 1));
+                        postsRef.child(postId).child(getString(R.string.key_plikes)).setValue("" + (Integer.parseInt(pLikes) - 1));
                         likesRef.child(postId).child(myUid).removeValue();
                         mProcessLike = false;
 
                     } else {
                         // not liked,like it
-                        postsRef.child(postId).child("pLikes").setValue("" + (Integer.parseInt(pLikes) + 1));
-                        likesRef.child(postId).child(myUid).setValue("Liked");// set any value
+                        postsRef.child(postId).child(getString(R.string.key_plikes)).setValue("" + (Integer.parseInt(pLikes) + 1));
+                        likesRef.child(postId).child(myUid).setValue(getString(R.string.liked));// set any value
                         mProcessLike = false;
 
                     }
@@ -375,31 +387,32 @@ public class CommentDetailActivity extends AppCompatActivity {
         });
     }
 
+    /*Vinh PV: comment bài viết*/
     private void postComment() {
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Adding comment ...");
-// get data from comment edit text
+        progressDialog.setMessage(getString(R.string.adding_comment));
+        // get data from comment edit text
         String comment = commentEt.getText().toString().trim();
-// validate
+        // validate
         if (TextUtils.isEmpty(comment)) {
             // no value is entered
-//            Toast.makeText(context:this,text:"Comment is empty ...",Toast.LENGTH_SHORT).show();
+        //  Toast.makeText(context:this,text:"Comment is empty ...",Toast.LENGTH_SHORT).show();
             return;
         }
 
         String timestamp = String.valueOf(System.currentTimeMillis());
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts").child(postId).child("Comments");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts)).child(postId).child(getString(R.string.path_comments));
 
         HashMap<String, Object> hashMap = new HashMap<>();
-// put info in hashmap
-        hashMap.put("cId", timestamp);
-        hashMap.put("comment", comment);
-        hashMap.put("timestamp", timestamp);
-        hashMap.put("uid", myUid);
-        hashMap.put("uEmail", myEmail);
-        hashMap.put("uDp", myDp);
-        hashMap.put("uName", myName);
-// put this data in db
+        // put info in hashmap
+        hashMap.put(getString(R.string.key_cid), timestamp);
+        hashMap.put(getString(R.string.key_comment), comment);
+        hashMap.put(getString(R.string.key_timestamp), timestamp);
+        hashMap.put(getString(R.string.key_uid), myUid);
+        hashMap.put(getString(R.string.key_uemail), myEmail);
+        hashMap.put(getString(R.string.key_udp), myDp);
+        hashMap.put(getString(R.string.key_uname), myName);
+        // put this data in db
         ref.child(timestamp).setValue(hashMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -420,14 +433,14 @@ public class CommentDetailActivity extends AppCompatActivity {
 
     private void updateCommentCount() {
         mProcessComment = true;
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts").child(postId);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts)).child(postId);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
                 if (mProcessComment) {
-                    String comments = "" + snapshot.child("pComments").getValue();
+                    String comments = "" + snapshot.child(getString(R.string.key_pcomment)).getValue();
                     int newCommentVal = Integer.parseInt(comments) + 1;
-                    ref.child("pComments").setValue("" + newCommentVal);
+                    ref.child(getString(R.string.key_pcomment)).setValue("" + newCommentVal);
                     mProcessComment = false;
                 }
             }
@@ -441,13 +454,13 @@ public class CommentDetailActivity extends AppCompatActivity {
 
     private void loadUserInfo() {
         // get current user info
-        Query myRef = FirebaseDatabase.getInstance().getReference("Users");
-        myRef.orderByChild("uid").equalTo(myUid).addListenerForSingleValueEvent(new ValueEventListener() {
+        Query myRef = FirebaseDatabase.getInstance().getReference(getString(R.string.path_users));
+        myRef.orderByChild(getString(R.string.key_uid)).equalTo(myUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                    myName = "" + ds.child("name").getValue();
-                    myDp = "" + ds.child("image").getValue();
+                    myName = "" + ds.child(getString(R.string.key_name)).getValue();
+                    myDp = "" + ds.child(getString(R.string.key_image)).getValue();
                     // set data
                     try {
                         //if image is received then set
@@ -466,37 +479,37 @@ public class CommentDetailActivity extends AppCompatActivity {
 
     private void loadPostInfo() {
         // get post using the id of the post
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts");
-        Query query = ref.orderByChild("pId").equalTo(postId);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(getString(R.string.path_posts));
+        Query query = ref.orderByChild(getString(R.string.key_pid)).equalTo(postId);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // keep checking the posts until get the required post
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     // get data
-                    String pTitle = "" + ds.child("pTitle").getValue();
-                    String pDescr = "" + ds.child("pDescr").getValue();
-                    pLikes = "" + ds.child("pLikes").getValue();
-                    String pTimeStamp = "" + ds.child("pTime").getValue();
-                    pImage = "" + ds.child("pImage").getValue();
-                    hisDp = "" + ds.child("uDp").getValue();
-                    hisUid = "" + ds.child("uid").getValue();
-                    String uEmail = "" + ds.child("uEmail").getValue();
-                    hisName = "" + ds.child("uName").getValue();
-                    String commentCount = "" + ds.child("pComments").getValue();
+                    String pTitle = "" + ds.child(getString(R.string.key_ptitle)).getValue();
+                    String pDescr = "" + ds.child(getString(R.string.key_pdescr)).getValue();
+                    pLikes = "" + ds.child(getString(R.string.key_plikes)).getValue();
+                    String pTimeStamp = "" + ds.child(getString(R.string.key_ptime)).getValue();
+                    pImage = "" + ds.child(getString(R.string.key_pimage)).getValue();
+                    hisDp = "" + ds.child(getString(R.string.key_udp)).getValue();
+                    hisUid = "" + ds.child(getString(R.string.key_uid)).getValue();
+                    String uEmail = "" + ds.child(getString(R.string.key_uemail)).getValue();
+                    hisName = "" + ds.child(getString(R.string.key_uname)).getValue();
+                    String commentCount = "" + ds.child(getString(R.string.key_pcomment)).getValue();
                     // convert timestamp to dd/mm/yyyy hh:mm am/pm
                     Calendar calendar = Calendar.getInstance(Locale.getDefault());
                     calendar.setTimeInMillis(Long.parseLong(pTimeStamp));
 
-                    String pTime = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
+                    String pTime = DateFormat.format(getString(R.string.format_date), calendar).toString();
                     // set data
                     pTitleTv.setText(pTitle);
                     pDescriptionTv.setText(pDescr);
-                    pLikesTv.setText(pLikes + " Likes");
+                    pLikesTv.setText(pLikes + getString(R.string.path_like));
                     pTimeTiv.setText(pTime);
-                    pCommentsTv.setText(commentCount + " Comments");
+                    pCommentsTv.setText(commentCount + getString(R.string.path_comments));
                     uNameTv.setText(hisName);
-                    if (pImage.equals("noImage")) {
+                    if (pImage.equals(getString(R.string.no_image))) {
                         // hide imageview
                         pImageIv.setVisibility(GONE);
                     } else {

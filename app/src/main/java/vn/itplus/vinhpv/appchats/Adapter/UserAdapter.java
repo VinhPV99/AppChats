@@ -62,7 +62,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyHolder> {
         }
 
         if (isChat) {
-            if (userList.get(position).getStatus().equals("online")) {
+            if (userList.get(position).getStatus().equals(context.getString(R.string.online))) {
                 holder.imageViewON.setVisibility(View.VISIBLE);
                 holder.imageViewOFF.setVisibility(View.INVISIBLE);
             } else {
@@ -78,22 +78,22 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.MyHolder> {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             if (isChatList){
                 Intent intent = new Intent(context, MessageActivity.class);
-                intent.putExtra("uid", userID);
+                intent.putExtra(context.getString(R.string.key_uid), userID);
                 context.startActivity(intent);
             }else{
-                builder.setItems(new String[]{"Profile", "Chat"}, new DialogInterface.OnClickListener() {
+                builder.setItems(new String[]{context.getString(R.string.profile), context.getString(R.string.chat)}, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
                             //profile click
                             Intent intent = new Intent(context, ThereProfileActivity.class);
-                            intent.putExtra("uid", userID);
+                            intent.putExtra(context.getString(R.string.key_uid), userID);
                             context.startActivity(intent);
                         }
                         if (which == 1) {
                             //chat click
                             Intent intent = new Intent(context, MessageActivity.class);
-                            intent.putExtra("uid", userID);
+                            intent.putExtra(context.getString(R.string.key_uid), userID);
                             context.startActivity(intent);
                         }
                     }

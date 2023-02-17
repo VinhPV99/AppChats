@@ -61,7 +61,7 @@ public class AdapterComments extends RecyclerView.Adapter<AdapterComments.MyHold
         // convert timestamp to dd/mm/yyyy hh:mm am/pm
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.setTimeInMillis(Long.parseLong(timestamp));
-        String pTime = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
+        String pTime = DateFormat.format(context.getString(R.string.format_date), calendar).toString();
 
         // set the data
         holder.nameTv.setText(name);
@@ -80,15 +80,15 @@ public class AdapterComments extends RecyclerView.Adapter<AdapterComments.MyHold
                     // my comment
                     // show delete dialog
                     AlertDialog.Builder builder = new AlertDialog.Builder(v.getRootView().getContext());
-                    builder.setTitle("Delete");
-                    builder.setMessage("Are you sure to delete this comment?");
-                    builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    builder.setTitle(R.string.delete);
+                    builder.setMessage(R.string.ask_to_delete_comment);
+                    builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             deleteComment(cid);
                         }
                     });
-                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    builder.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
@@ -103,15 +103,15 @@ public class AdapterComments extends RecyclerView.Adapter<AdapterComments.MyHold
     }
 
     private void deleteComment(String cid) {
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Posts").child(postId);
-        ref.child("Comments").child(cid).removeValue();// it will delete the comment
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference(context.getString(R.string.path_posts)).child(postId);
+        ref.child(context.getString(R.string.path_comments)).child(cid).removeValue();// it will delete the comment
         // now update the comments count
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@androidx.annotation.NonNull DataSnapshot snapshot) {
-                String comments = "" + snapshot.child("pComments").getValue();
+                String comments = "" + snapshot.child(context.getString(R.string.key_pcomment)).getValue();
                 int newCommentVal = Integer.parseInt(comments) - 1;
-                ref.child("pComments").setValue("" + newCommentVal);
+                ref.child(context.getString(R.string.key_pcomment)).setValue("" + newCommentVal);
             }
 
             @Override

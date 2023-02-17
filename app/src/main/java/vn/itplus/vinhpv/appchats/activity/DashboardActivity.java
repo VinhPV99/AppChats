@@ -24,6 +24,7 @@ import vn.itplus.vinhpv.appchats.Fragment.ProfileFragment;
 import vn.itplus.vinhpv.appchats.Fragment.UsersFragment;
 import vn.itplus.vinhpv.appchats.R;
 
+/** Vinh PV: Activity trang chủ*/
 public class DashboardActivity extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     ActionBar actionBar;
@@ -40,14 +41,14 @@ public class DashboardActivity extends AppCompatActivity {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         // set title actionbar
         actionBar = getSupportActionBar();
-        actionBar.setTitle("Dashboard");
+        actionBar.setTitle(R.string.dashboard);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
         BottomNavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(selectedListener);
 
-        actionBar.setTitle("Trang chủ");
+        actionBar.setTitle(R.string.home);
         HomeFragment fragment = new HomeFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.content, fragment, "");
@@ -63,7 +64,7 @@ public class DashboardActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.nav_home:
 
-                    actionBar.setTitle("Trang chủ");
+                    actionBar.setTitle(R.string.home);
                     HomeFragment fragment = new HomeFragment();
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     ft.replace(R.id.content, fragment, "");
@@ -72,7 +73,7 @@ public class DashboardActivity extends AppCompatActivity {
 
                 case R.id.nav_chats:
 
-                    actionBar.setTitle("Cuộc Trò Chuyện");
+                    actionBar.setTitle(R.string.chat);
                     ChatListFragment fragment1 = new ChatListFragment();
                     FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
                     ft1.replace(R.id.content, fragment1, "");
@@ -80,7 +81,7 @@ public class DashboardActivity extends AppCompatActivity {
                     return true;
                 case R.id.nav_users:
 
-                    actionBar.setTitle("Người Dùng");
+                    actionBar.setTitle(R.string.users);
                     UsersFragment fragment2 = new UsersFragment();
                     FragmentTransaction ft2 = getSupportFragmentManager().beginTransaction();
                     ft2.replace(R.id.content, fragment2, "");
@@ -88,7 +89,7 @@ public class DashboardActivity extends AppCompatActivity {
                     return true;
                 case R.id.nav_profile:
 
-                    actionBar.setTitle("Trang Cá Nhân");
+                    actionBar.setTitle(R.string.profile);
                     ProfileFragment fragment3 = new ProfileFragment();
                     FragmentTransaction ft3 = getSupportFragmentManager().beginTransaction();
                     ft3.replace(R.id.content, fragment3, "");
@@ -107,9 +108,9 @@ public class DashboardActivity extends AppCompatActivity {
         }else{
             mUid = user.getUid();
 
-            SharedPreferences sharedPreferences = getSharedPreferences("SP_USER",MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.key_sp_user),MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("Current_USERID",mUid);
+            editor.putString(getString(R.string.current_userid),mUid);
             editor.apply();
         }
     }
@@ -129,21 +130,21 @@ public class DashboardActivity extends AppCompatActivity {
 
     //check status
     private void CheckStatus(String status) {
-        myRef = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+        myRef = FirebaseDatabase.getInstance().getReference(getString(R.string.path_users)).child(firebaseUser.getUid());
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("status", status);
+        hashMap.put(getString(R.string.status), status);
         myRef.updateChildren(hashMap);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        CheckStatus("online");
+        CheckStatus(getString(R.string.online));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        CheckStatus("offline");
+        CheckStatus(getString(R.string.offline));
     }
 }

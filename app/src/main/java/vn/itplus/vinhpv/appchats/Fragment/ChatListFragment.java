@@ -55,7 +55,7 @@ public class ChatListFragment extends Fragment {
         fuser = FirebaseAuth.getInstance().getCurrentUser();
         userList = new ArrayList<>();
 
-        reference = FirebaseDatabase.getInstance().getReference("ChatList").child(fuser.getUid());
+        reference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_chat_list)).child(fuser.getUid());
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -78,7 +78,7 @@ public class ChatListFragment extends Fragment {
 
     private void chatlist() {
         mUser = new ArrayList<>();
-        reference = FirebaseDatabase.getInstance().getReference("Users");
+        reference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_users));
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -107,7 +107,7 @@ public class ChatListFragment extends Fragment {
     private void searchChatlist(String query) {
 
         mUser = new ArrayList<>();
-        reference = FirebaseDatabase.getInstance().getReference("Users");
+        reference = FirebaseDatabase.getInstance().getReference(getString(R.string.path_users));
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

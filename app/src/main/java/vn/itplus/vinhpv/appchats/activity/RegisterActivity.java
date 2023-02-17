@@ -28,7 +28,7 @@ import java.util.HashMap;
 import vn.itplus.vinhpv.appchats.R;
 
 /**
- * VinhPV Lớp đăng ký tài khoản
+ * VinhPV: Lớp đăng ký tài khoản
  */
 public class RegisterActivity extends AppCompatActivity {
     EditText txtEmail, txtPass;
@@ -49,12 +49,12 @@ public class RegisterActivity extends AppCompatActivity {
         Tvlogin = findViewById(R.id.TvLogin);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Đăng Ký");
+        actionBar.setTitle(R.string.register);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(" Đang Đăng Ký...");
+        progressDialog.setMessage(getString(R.string.signing_up));
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -66,12 +66,12 @@ public class RegisterActivity extends AppCompatActivity {
                 String password = txtPass.getText().toString().trim();
                 //set Email hợp lệ
                 if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    txtEmail.setError("Email bạn nhập không hợp lệ !!!");
+                    txtEmail.setError(getString(R.string.email_failed));
                     txtEmail.setFocusable(true);
                 }
                 //set Pass hợp lệ
                 else if (password.length() < 6) {
-                    txtPass.setError("Mật khẩu ít nhất phải 6 kí tự !!!");
+                    txtPass.setError(getString(R.string.email_sort));
                     txtPass.setFocusable(true);
                 } else {
                     registerUser(email, password);
@@ -103,27 +103,27 @@ public class RegisterActivity extends AppCompatActivity {
 
                             HashMap<Object, String> hashMap = new HashMap<>();
 
-                            hashMap.put("email", email);
-                            hashMap.put("uid", uid);
-                            hashMap.put("name", "");
-                            hashMap.put("onlineStatus", "online");
-                            hashMap.put("status", "online");
-                            hashMap.put("phone", "");
-                            hashMap.put("image", "");
-                            hashMap.put("cover", "");
+                            hashMap.put(getString(R.string.key_email), email);
+                            hashMap.put(getString(R.string.key_uid), uid);
+                            hashMap.put(getString(R.string.key_name), "");
+                            hashMap.put(getString(R.string.key_online_status), getString(R.string.online));
+                            hashMap.put(getString(R.string.status), getString(R.string.online));
+                            hashMap.put(getString(R.string.phone), "");
+                            hashMap.put(getString(R.string.key_image), "");
+                            hashMap.put(getString(R.string.cover), "");
 
                             FirebaseDatabase database = FirebaseDatabase.getInstance();
-                            DatabaseReference reference = database.getReference("Users");
+                            DatabaseReference reference = database.getReference(getString(R.string.path_users));
                             reference.child(uid).setValue(hashMap);
 
 
-                            Toast.makeText(RegisterActivity.this, "Đăng kí thành công" + user
+                            Toast.makeText(RegisterActivity.this, getString(R.string.sign_up_success) + user
                                     .getEmail(), Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(RegisterActivity.this, DashboardActivity.class));
                             finish();
                         } else {
                             progressDialog.dismiss();
-                            Toast.makeText(RegisterActivity.this, "Tài khoản đã tồn tại !!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(RegisterActivity.this, R.string.account_exists, Toast.LENGTH_LONG).show();
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
